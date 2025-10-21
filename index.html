@@ -1,0 +1,2579 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>RAG Website</title>
+    <link
+      rel="icon"
+      type="image/png"
+      href="img/Screenshot 2025-10-15 100814.png"
+    />
+    <style>
+      :root {
+        --bg: #0b0f18;
+        --panel: #0f1726;
+        --card: #141728;
+        --accent: #1f6fb0;
+        --muted: #9fb6dd;
+        --text: #e6eef8;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: Inter, Arial, Helvetica, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+      }
+      header {
+        background: linear-gradient(180deg, #0c1630 0%, #0b1330 100%);
+        padding: 14px 22px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        font-weight: 700;
+        font-size: 20px;
+      }
+      .logo {
+        width: 72px;
+        height: 72px;
+        border-radius: 12px;
+        object-fit: contain;
+        background: transparent;
+      }
+      nav {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      nav button {
+        background: #142033;
+        color: #fff;
+        border: 0;
+        padding: 8px 10px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: 0.2s;
+        font-size: 14px;
+      }
+      nav button:hover {
+        transform: translateY(-2px);
+        background: #1f6fb0;
+      }
+      nav input {
+        padding: 8px 10px;
+        border-radius: 8px;
+        border: 0;
+        background: #fff;
+        color: #111;
+        width: 260px;
+        font-size: 14px;
+      }
+      .sort-options {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+      }
+      .sort-btn {
+        background: var(--panel);
+        color: var(--muted);
+        border: 1px solid #2a3a5a;
+        padding: 8px 16px;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: 0.2s;
+        font-size: 14px;
+      }
+      .sort-btn:hover {
+        background: #1a2a4a;
+      }
+      .sort-btn.active {
+        background: var(--accent);
+        color: white;
+        border-color: var(--accent);
+      }
+      main.container {
+        padding: 22px;
+      }
+      h2.section-title {
+        color: #fff;
+        margin: 0 0 12px 0;
+        font-size: 20px;
+      }
+      .categories {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+      .category-btn {
+        background: var(--panel);
+        color: var(--muted);
+        border: 1px solid #2a3a5a;
+        padding: 8px 16px;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: 0.2s;
+        font-size: 14px;
+      }
+      .category-btn:hover {
+        background: #1a2a4a;
+      }
+      .category-btn.active {
+        background: var(--accent);
+        color: white;
+        border-color: var(--accent);
+      }
+      .games-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+        gap: 18px;
+        margin-top: 12px;
+      }
+      .card {
+        background: var(--card);
+        border-radius: 10px;
+        padding: 10px;
+        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.5);
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        transition: transform 0.22s ease, box-shadow 0.22s ease;
+      }
+      .card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 14px 28px rgba(0, 0, 0, 0.6);
+      }
+      .card img {
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 8px;
+        background: #0f1726;
+        transition: transform 0.22s;
+      }
+      .card img:hover {
+        transform: scale(1.06);
+      }
+      .card .title {
+        margin-top: 10px;
+        font-size: 14px;
+        color: var(--text);
+        text-align: center;
+        font-weight: 500;
+      }
+      .card .category-tag {
+        margin-top: 5px;
+        font-size: 11px;
+        color: var(--muted);
+        background: rgba(31, 111, 176, 0.2);
+        padding: 2px 8px;
+        border-radius: 10px;
+      }
+      .card .release-date {
+        margin-top: 4px;
+        font-size: 10px;
+        color: #9fb6dd;
+        opacity: 0.8;
+      }
+      .detail {
+        display: none;
+        padding-top: 10px;
+      }
+      .detail.active {
+        display: block;
+      }
+      .back-btn {
+        background: #1f6fb0;
+        color: #fff;
+        border: 0;
+        padding: 8px 12px;
+        border-radius: 8px;
+        cursor: pointer;
+        margin-bottom: 14px;
+        font-size: 14px;
+      }
+      .detail-layout {
+        display: flex;
+        gap: 24px;
+        align-items: flex-start;
+        flex-wrap: wrap;
+      }
+      .detail-left img {
+        width: 320px;
+        max-width: 100%;
+        border-radius: 10px;
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.6);
+      }
+      .detail-right {
+        flex: 1;
+        min-width: 300px;
+      }
+      .meta {
+        color: var(--muted);
+        margin: 6px 0;
+        font-size: 14px;
+      }
+      .desc {
+        color: #dfeeff;
+        line-height: 1.6;
+        margin-top: 10px;
+      }
+      iframe.trailer {
+        width: 100%;
+        max-width: 520px;
+        height: 280px;
+        border-radius: 8px;
+        border: 0;
+        margin-top: 14px;
+      }
+      .review-form input,
+      .review-form textarea {
+        width: 100%;
+        max-width: 520px;
+        padding: 8px 10px;
+        border-radius: 6px;
+        border: 0;
+        margin-top: 8px;
+        font-size: 14px;
+      }
+      .review-form button {
+        margin-top: 10px;
+        background: #1f6fb0;
+        color: #fff;
+        border: 0;
+        padding: 8px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      .reviews-section {
+        display: none;
+      }
+      .reviews-section.active {
+        display: block;
+      }
+      .reviews-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 16px;
+      }
+      .small-card {
+        background: var(--card);
+        padding: 8px;
+        border-radius: 8px;
+        cursor: pointer;
+        text-align: center;
+        transition: 0.2s;
+      }
+      .small-card:hover {
+        transform: translateY(-5px);
+        background: #1b253d;
+      }
+      .small-card img {
+        width: 100%;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 6px;
+      }
+      .small-card .title {
+        margin-top: 8px;
+        font-size: 13px;
+        color: var(--text);
+      }
+      .small-card .category-tag {
+        margin-top: 4px;
+        font-size: 10px;
+        color: var(--muted);
+        background: rgba(31, 111, 176, 0.2);
+        padding: 2px 6px;
+        border-radius: 8px;
+      }
+      .small-card .release-date {
+        margin-top: 3px;
+        font-size: 9px;
+        color: #9fb6dd;
+        opacity: 0.8;
+      }
+      .review-read {
+        text-align: center;
+      }
+      .review-read img {
+        max-width: 300px;
+        border-radius: 10px;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+        display: block;
+        margin: 0 auto 16px;
+      }
+
+      /* Game Not Found Styles */
+      .no-games {
+        text-align: center;
+        padding: 40px 20px;
+        color: var(--muted);
+        font-size: 18px;
+        grid-column: 1 / -1;
+      }
+
+      .no-games h3 {
+        margin: 0 0 10px 0;
+        font-size: 24px;
+        color: var(--text);
+      }
+
+      .no-games p {
+        margin: 10px 0;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      /* Responsive Styles */
+      @media (max-width: 820px) {
+        .detail-layout {
+          flex-direction: column;
+        }
+        iframe.trailer {
+          max-width: 100%;
+          height: 240px;
+        }
+      }
+
+      /* Tablet Styles */
+      @media (max-width: 1024px) {
+        header {
+          padding: 12px 16px;
+        }
+        .brand {
+          font-size: 18px;
+          gap: 12px;
+        }
+        .logo {
+          width: 45px;
+          height: 45px;
+        }
+        nav input {
+          width: 200px;
+        }
+        main.container {
+          padding: 16px;
+        }
+        .games-grid {
+          grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+          gap: 14px;
+        }
+        .card img {
+          width: 120px;
+          height: 120px;
+        }
+        .detail-left img {
+          width: 280px;
+        }
+        .reviews-grid {
+          grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        }
+      }
+
+      /* Mobile Styles */
+      @media (max-width: 768px) {
+        header {
+          flex-direction: column;
+          align-items: flex-start;
+          padding: 10px 14px;
+        }
+        nav {
+          width: 100%;
+          justify-content: space-between;
+          margin-top: 8px;
+        }
+        nav input {
+          width: 100%;
+          margin-top: 8px;
+        }
+        .brand {
+          font-size: 18px;
+          gap: 10px;
+        }
+        .logo {
+          width: 45px;
+          height: 45px;
+        }
+        main.container {
+          padding: 12px;
+        }
+        h2.section-title {
+          font-size: 18px;
+        }
+        .categories {
+          gap: 8px;
+          margin-bottom: 16px;
+        }
+        .category-btn {
+          padding: 6px 12px;
+          font-size: 13px;
+        }
+        .games-grid {
+          grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+          gap: 12px;
+        }
+        .card {
+          padding: 8px;
+        }
+        .card img {
+          width: 100px;
+          height: 100px;
+        }
+        .card .title {
+          font-size: 12px;
+          margin-top: 6px;
+        }
+        .card .category-tag {
+          font-size: 10px;
+          margin-top: 4px;
+        }
+        .card .release-date {
+          font-size: 9px;
+        }
+        .detail-left img {
+          width: 100%;
+        }
+        .detail-right {
+          min-width: 100%;
+        }
+        .meta {
+          font-size: 13px;
+        }
+        .desc {
+          font-size: 14px;
+        }
+        iframe.trailer {
+          height: 200px;
+        }
+        .reviews-grid {
+          grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+          gap: 12px;
+        }
+        .small-card img {
+          height: 100px;
+        }
+        .small-card .title {
+          font-size: 12px;
+        }
+        .small-card .category-tag {
+          font-size: 9px;
+        }
+        .small-card .release-date {
+          font-size: 8px;
+        }
+        .review-read img {
+          max-width: 100%;
+        }
+        .no-games {
+          padding: 30px 15px;
+          font-size: 16px;
+        }
+        .no-games h3 {
+          font-size: 20px;
+        }
+      }
+
+      /* tampilan Handphone*/
+      @media (max-width: 480px) {
+        header {
+          padding: 8px 12px;
+        }
+        nav button {
+          padding: 6px 8px;
+          font-size: 12px;
+        }
+        .brand {
+          font-size: 16px;
+          gap: 8px;
+        }
+        .logo {
+          width: 45px;
+          height: 45px;
+        }
+        main.container {
+          padding: 10px;
+        }
+        h2.section-title {
+          font-size: 16px;
+        }
+        .categories {
+          gap: 6px;
+          margin-bottom: 14px;
+        }
+        .category-btn {
+          padding: 5px 10px;
+          font-size: 12px;
+        }
+        .games-grid {
+          grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+          gap: 10px;
+        }
+        .card {
+          padding: 6px;
+        }
+        .card img {
+          width: 85px;
+          height: 85px;
+        }
+        .card .title {
+          font-size: 11px;
+        }
+        .card .category-tag {
+          font-size: 9px;
+        }
+        .card .release-date {
+          font-size: 8px;
+        }
+        .back-btn {
+          padding: 6px 10px;
+          font-size: 12px;
+        }
+        .detail-layout {
+          gap: 16px;
+        }
+        .meta {
+          font-size: 12px;
+        }
+        .desc {
+          font-size: 13px;
+        }
+        iframe.trailer {
+          height: 180px;
+        }
+        .review-form input,
+        .review-form textarea {
+          font-size: 13px;
+        }
+        .review-form button {
+          padding: 6px 10px;
+          font-size: 13px;
+        }
+        .reviews-grid {
+          grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+          gap: 10px;
+        }
+        .small-card {
+          padding: 6px;
+        }
+        .small-card img {
+          height: 80px;
+        }
+        .small-card .title {
+          font-size: 11px;
+        }
+        .small-card .category-tag {
+          font-size: 8px;
+        }
+        .small-card .release-date {
+          font-size: 7px;
+        }
+        .no-games {
+          padding: 20px 10px;
+          font-size: 14px;
+        }
+        .no-games h3 {
+          font-size: 18px;
+        }
+        .no-games p {
+          font-size: 12px;
+        }
+      }
+
+      /* Touch-friendly improvements */
+      @media (hover: none) {
+        .card:hover {
+          transform: none;
+          box-shadow: 0 6px 14px rgba(0, 0, 0, 0.5);
+        }
+        .card img:hover {
+          transform: none;
+        }
+        .small-card:hover {
+          transform: none;
+          background: var(--card);
+        }
+        nav button:hover {
+          transform: none;
+          background: #142033;
+        }
+        .category-btn:hover {
+          background: var(--panel);
+        }
+        .sort-btn:hover {
+          background: var(--panel);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="brand">
+        <img
+          src="img/Screenshot 2025-10-07 194237.png"
+          alt="Review All Games"
+          class="logo"
+        />
+        <span>Review All Games</span>
+      </div>
+      <nav>
+        <button id="homeBtn">Home</button>
+        <button id="reviewsBtn">Reviews</button>
+        <input id="searchInput" placeholder="Cari game..." />
+        <!-- Tombol A-Z di bawah search bar telah dihapus -->
+      </nav>
+    </header>
+
+    <main class="container">
+      <section id="homeSection">
+        <h2 class="section-title">Game List</h2>
+        <div class="sort-options">
+          <button class="sort-btn" id="sortAZ">A-Z</button>
+          <button class="sort-btn" id="sortNewest">Terbaru</button>
+          <button class="sort-btn" id="sortOldest">Terlama</button>
+        </div>
+        <div class="categories" id="categoriesContainer"></div>
+        <div id="gamesRow" class="games-grid"></div>
+      </section>
+
+      <section id="detailSection" class="detail">
+        <button class="back-btn" id="backBtn">← Back</button>
+        <div id="detailContent"></div>
+      </section>
+
+      <section id="reviewsSection" class="reviews-section">
+        <button class="back-btn" id="backFromReviews">← Back</button>
+        <h2 class="section-title">Reviews Game</h2>
+        <div class="sort-options">
+          <button class="sort-btn" id="sortReviewsAZ">A-Z</button>
+          <button class="sort-btn" id="sortReviewsNewest">Terbaru</button>
+          <button class="sort-btn" id="sortReviewsOldest">Terlama</button>
+        </div>
+        <div class="categories" id="reviewsCategoriesContainer"></div>
+        <div id="reviewsGrid" class="reviews-grid"></div>
+        <div id="reviewsDetail" style="margin-top: 18px"></div>
+      </section>
+    </main>
+
+    <script>
+      // DATA GAME LENGKAP dengan developer dan tanggal rilis format YYYY-MM-DD
+      const games = [
+        {
+          id: "hades",
+          title: "Hades",
+          cover:
+            "https://cdn.cloudflare.steamstatic.com/steam/apps/1145360/header.jpg",
+          genre: "Action · Roguelike",
+          category: "Roguelike",
+          platform: "PC, Switch, PS4/5, Xbox",
+          releaseDate: "2020-09-17",
+          developer: "Supergiant Games",
+          desc: "Hades adalah roguelike intens dari Supergiant Games. Pemain mengendalikan Zagreus, putra Hades, yang berusaha kabur dari dunia bawah. Dengan combat yang cepat, narasi dinamis, dan karakter yang memikat, setiap kematian membawa kemajuan cerita dan upgrade baru.",
+          trailer: "https://www.youtube.com/embed/91t0ha9x0AE",
+        },
+        {
+          id: "riskofrain2",
+          title: "Risk of Rain 2",
+          cover:
+            "https://cdn.cloudflare.steamstatic.com/steam/apps/632360/header.jpg",
+          genre: "Roguelike · Third-person Shooter",
+          category: "Roguelike",
+          platform: "PC, PS4, Xbox, Switch",
+          releaseDate: "2020-08-11",
+          developer: "Hopoo Games",
+          desc: "Roguelike shooter 3D dengan progresi power yang gila. Kombinasi item yang tak terbatas membuat setiap run unik dan semakin chaotic seiring waktu.",
+          trailer: "https://www.youtube.com/embed/pJ-aR--gScM",
+        },
+        {
+          id: "slaythespire",
+          title: "Slay the Spire",
+          cover:
+            "https://cdn.cloudflare.steamstatic.com/steam/apps/646570/header.jpg",
+          genre: "Roguelike · Deck-building · Strategy",
+          category: "Roguelike",
+          platform: "PC, PS4, Xbox, Switch, Mobile",
+          releaseDate: "2019-01-23",
+          developer: "Mega Crit Games",
+          desc: "Roguelike deck-building yang inovatif. Bangun deck kartu sambil mendaki menara dan hadapi bos yang menantang. Kombinasi strategi dan RNG yang sempurna.",
+          trailer: "https://www.youtube.com/embed/9SZUtyYSOjQ",
+        },
+        {
+          id: "enterthegungeon",
+          title: "Enter the Gungeon",
+          cover:
+            "https://cdn.cloudflare.steamstatic.com/steam/apps/311690/header.jpg",
+          genre: "Roguelike · Bullet Hell · Action",
+          category: "Roguelike",
+          platform: "PC, PS4, Xbox One, Nintendo Switch",
+          releaseDate: "2016-04-05",
+          developer: "Dodge Roll",
+          desc: "Roguelike bullet hell yang chaotic dan addictive! Sebagai 'Gungeoneer', jelajahi dungeon yang penuh dengan senjata gila, item aneh, dan bos menantang. Dengan ratusan senjata unik dan synergies yang tak terhitung, setiap run merasa fresh dan unpredictable. Perfect untuk fans challenge dan replayability!",
+          trailer: "https://www.youtube.com/embed/YSpo2VvN0SM",
+        },
+        {
+          id: "gtav",
+          title: "Grand Theft Auto V",
+          cover:
+            "https://cdn.cloudflare.steamstatic.com/steam/apps/271590/header.jpg",
+          genre: "Action · Open World",
+          category: "Open World",
+          platform: "PC, PS3/4/5, Xbox 360/One/Series",
+          releaseDate: "2013-09-17",
+          developer: "Rockstar North",
+          desc: "GTA V menawarkan kota Los Santos yang hidup dengan misi cerita dan mode online ekstensif. Pemain beralih antar karakter dengan latar cerita kriminal yang gelap dan satir. Dunia terbuka penuh aktivitas sampingan, kendaraan, dan modifikasi. Mode online terus menerima pembaruan sehingga tetap relevan bertahun-tahun.",
+          trailer: "https://www.youtube.com/embed/QkkoHAzjnUs",
+        },
+        {
+          id: "witcher3",
+          title: "The Witcher 3: Wild Hunt",
+          cover:
+            "https://cdn.cloudflare.steamstatic.com/steam/apps/292030/header.jpg",
+          genre: "RPG · Open World",
+          category: "RPG",
+          platform: "PC, PS4/5, Xbox One/Series, Switch",
+          releaseDate: "2015-05-19",
+          developer: "CD Projekt Red",
+          desc: "RPG epik dari CD Projekt RED yang menampilkan Geralt of Rivia. Dunia luas, quest sampingan berkualitas, dan pilihan moral berdampak pada cerita. Combat memadukan sihir, pedang, dan persiapan strategi. Narasi mendalam dan ekspansi yang kuat membuatnya masih menjadi tolok ukur genre.",
+          trailer: "https://www.youtube.com/embed/c0i88t0Kacs",
+        },
+        {
+          id: "eldenring",
+          title: "Elden Ring",
+          cover:
+            "https://cdn.cloudflare.steamstatic.com/steam/apps/1245620/header.jpg",
+          genre: "Action RPG · Open World",
+          category: "Soulslike",
+          platform: "PC, PS4/5, Xbox One/Series",
+          releaseDate: "2022-02-25",
+          developer: "FromSoftware",
+          desc: "Kolaborasi FromSoftware & George R.R. Martin, Elden Ring menghadirkan dunia gelap luas. Eksplorasi non-linear, bos menantang, dan sistem karakter dalam. Mekanik berkualitas dari seri Souls ditingkatkan dengan kebebasan bergerak dan kuda tunggangan. Cocok untuk pemain petualang yang mencari tantangan.",
+          trailer: "https://www.youtube.com/embed/E3Huy2cdih0",
+        },
+        {
+          id: "skyrim",
+          title: "The Elder Scrolls V: Skyrim",
+          cover:
+            "https://cdn.cloudflare.steamstatic.com/steam/apps/489830/header.jpg",
+          genre: "RPG · Open World · Fantasy",
+          category: "RPG",
+          platform: "PC, PS4, PS5, Xbox, Switch",
+          releaseDate: "2011-11-11",
+          developer: "Bethesda Game Studios",
+          desc: "Skyrim adalah RPG fantasi epik di mana pemain menjadi Dragonborn yang ditakdirkan menyelamatkan dunia dari naga Alduin.",
+          trailer: "https://www.youtube.com/embed/JSRtYpNRoN0",
+        },
+        {
+          id: "darksouls2",
+          title: "Dark Souls II",
+          cover:
+            "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/236430/capsule_616x353.jpg?t=1726158600",
+          genre: "Action RPG · Soulslike",
+          category: "Soulslike",
+          platform: "PC, PS3, Xbox 360",
+          releaseDate: "2014-03-11",
+          developer: "FromSoftware",
+          desc: "Dark Souls II adalah game action RPG penuh tantangan dari FromSoftware. Menawarkan dunia gelap, desain level kompleks, sistem pertarungan presisi, serta atmosfer misterius. Pemain menjelajahi kerajaan Drangleic, menghadapi bos sulit, dan mengungkap lore yang dalam.",
+          trailer: "https://www.youtube.com/embed/U6uyuIQYlfY",
+        },
+        {
+          id: "baldursgate3",
+          title: "Baldur's Gate 3",
+          cover:
+            "https://cdn.cloudflare.steamstatic.com/steam/apps/1086940/header.jpg",
+          genre: "RPG · Turn-based",
+          category: "RPG",
+          platform: "PC, PS5, Xbox",
+          releaseDate: "2023-08-03",
+          developer: "Larian Studios",
+          desc: "Adaptasi D&D yang kaya pilihan dialog dan konsekuensi. Pemain membentuk partai, memilih ras/kelas, dan berinteraksi dengan cerita bercabang. Pertempuran berbasis giliran memerlukan taktik dan pemanfaatan lingkungan. Cocok untuk penggemar RPG taktik dan cerita mendalam.",
+          trailer: "https://www.youtube.com/embed/1T22wNvoNiU",
+        },
+        {
+          id: "cyberpunk",
+          title: "Cyberpunk 2077: Phantom Liberty",
+          cover:
+            "https://cdn.cloudflare.steamstatic.com/steam/apps/1091500/header.jpg",
+          genre: "Action RPG · Open World",
+          category: "Open World",
+          platform: "PC, PS5, Xbox",
+          releaseDate: "2023-09-26",
+          developer: "CD Projekt Red",
+          desc: "Cyberpunk 2077 adalah RPG berlatar kota futuristik Night City. Setelah perbaikan besar, game kini stabil dan Phantom Liberty menambah konten cerita. Dunia terbuka penuh karakter berwarna, modifikasi augments, dan misi berlapis.",
+          trailer: "https://www.youtube.com/embed/qIcTM8WXFjk",
+        },
+        {
+          id: "starfield",
+          title: "Starfield",
+          cover:
+            "https://cdn.cloudflare.steamstatic.com/steam/apps/1716740/header.jpg",
+          genre: "Sci-Fi RPG · Open World",
+          category: "RPG",
+          platform: "PC, Xbox",
+          releaseDate: "2023-09-06",
+          developer: "Bethesda Game Studios",
+          desc: "Starfield adalah RPG luar angkasa dari Bethesda. Pemain menjelajahi planet, membangun kapal, dan menyelesaikan misi organisasi. Gameplay menggabungkan eksplorasi, crafting, dan narasi bertingkat.",
+          trailer: "https://www.youtube.com/embed/kfYEiTdsyas",
+        },
+        {
+          id: "gowragnarok",
+          title: "God of War Ragnarök",
+          cover:
+            "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2322010/capsule_616x353.jpg",
+          genre: "Action · Adventure",
+          category: "Action",
+          platform: "PS4, PS5",
+          releaseDate: "2022-11-09",
+          developer: "Santa Monica Studio",
+          desc: "Lanjutan petualangan Kratos & Atreus di mitologi Nordik. Pertarungan intens dipadukan narasi emosional dan karakter kuat. Dunia semi-linear dengan quest dan cerita utama menggugah.",
+          trailer: "https://www.youtube.com/embed/dIQGI36BxDE",
+        },
+        {
+          id: "horizonforbiddenwest",
+          title: "Horizon Forbidden West",
+          cover:
+            "https://cdn.cloudflare.steamstatic.com/steam/apps/2420110/header.jpg",
+          genre: "Open World · Action RPG · Sci-Fi · Adventure",
+          category: "Open World",
+          platform: "PS4, PS5, PC",
+          releaseDate: "2022-02-18",
+          developer: "Guerrilla Games",
+          desc: "Sequel yang lebih epic dari Horizon Zero Dawn! Jelajahi dunia post-apocalyptic yang breathtaking sebagai Aloy, dari deserts yang vast sampai underwater cities yang misterius. Hadapi machines yang lebih berbahaya dan ungkap misteri yang mengancam seluruh kehidupan. Dengan visual next-gen yang mind-blowing dan gameplay yang lebih refined!",
+          trailer: "https://www.youtube.com/embed/Lq594XmpPBg",
+        },
+        {
+          id: "hogwarts",
+          title: "Hogwarts Legacy",
+          cover:
+            "https://cdn.cloudflare.steamstatic.com/steam/apps/990080/header.jpg",
+          genre: "RPG · Open World",
+          category: "RPG",
+          platform: "PC, PS4/5, Xbox, Switch",
+          releaseDate: "2023-02-10",
+          developer: "Avalanche Software",
+          desc: "RPG di dunia sihir Harry Potter, berfokus pada eksplorasi kastil dan sekitarnya. Pemain membuat karakter sendiri, memilih rumah, dan mempelajari sihir. Quest sampingan & misteri sekolah memberikan banyak pilihan.",
+          trailer: "https://www.youtube.com/embed/1O6Qstncpnc",
+        },
+        {
+          id: "sekiro",
+          title: "Sekiro: Shadows Die Twice",
+          cover:
+            "https://cdn.cloudflare.steamstatic.com/steam/apps/814380/header.jpg",
+          genre: "Action · Soulslike",
+          category: "Soulslike",
+          platform: "PC, PS4, Xbox One",
+          releaseDate: "2019-03-22",
+          developer: "FromSoftware",
+          desc: "Dikenal untuk pertarungan parry yang ketat dan sistem prostetik unik. Sekiro menuntut presisi dan timing. Dunia berlatar Jepang feodal, cerita berfokus pada samurai dan balas dendam.",
+          trailer: "https://www.youtube.com/embed/rXMX4YJ7Lks",
+        },
+        {
+          id: "rdr2",
+          title: "Red Dead Redemption II",
+          cover:
+            "https://cdn.cloudflare.steamstatic.com/steam/apps/1174180/header.jpg",
+          genre: "Action · Open World",
+          category: "Open World",
+          platform: "PC, PS4, Xbox One",
+          releaseDate: "2018-10-26",
+          developer: "Rockstar Studios",
+          desc: "Pengalaman koboi sangat imersif dari Rockstar: cerita dalam, dunia hidup, dan detail realistis. Gameplay menggabungkan misi, berburu, dan interaksi NPC mendalam.",
+          trailer: "https://www.youtube.com/embed/HVRzx17WHVk",
+        },
+        {
+          id: "ffxvi",
+          title: "Final Fantasy XVI",
+          cover:
+            "https://assets-prd.ignimgs.com/2021/08/05/final-fantasy-xvi-button-1628180674117.jpg",
+          genre: "Action RPG",
+          category: "RPG",
+          platform: "PS5",
+          releaseDate: "2023-06-22",
+          developer: "Square Enix",
+          desc: "Final Fantasy dengan fokus pada cerita gelap dan pertempuran real-time. Menampilkan world-building besar dan konflik politik antar kerajaan.",
+          trailer: "https://www.youtube.com/embed/aPT26Dd3OzE",
+        },
+        {
+          id: "liesofp",
+          title: "Lies of P",
+          cover:
+            "https://cdn.dlcompare.com/game_tetiere/upload/gameimage/file/lies-of-p-file-9232770c1.jpg.webp",
+          genre: "Soulslike · Action",
+          category: "Soulslike",
+          platform: "PC, PS4/5, Xbox",
+          releaseDate: "2023-09-19",
+          developer: "Neowiz Games, Round8 Studio",
+          desc: "Soulslike terinspirasi kisah Pinokio; mekanik bertarung berat dan estetika gelap. Pemain membuat keputusan moral yang mempengaruhi cerita.",
+          trailer: "https://www.youtube.com/embed/b-pBtuYX6zc",
+        },
+        {
+          id: "assassinsmirage",
+          title: "Assassin's Creed Mirage",
+          cover:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTY9Wnj0byavgMQrPIV2I_cATGHUg-MXvH-iQ&s",
+          genre: "Action · Stealth",
+          category: "Action",
+          platform: "PC, PS4/5, Xbox",
+          releaseDate: "2023-10-05",
+          developer: "Ubisoft Bordeaux",
+          desc: "Kembali ke akar stealth Assassin's Creed dengan skala lebih kecil dan fokus pada narasi. Gameplay menonjolkan parkour, pembunuhan tersembunyi, dan pengintaian.",
+          trailer: "https://www.youtube.com/embed/x55lAlFtXmw",
+        },
+        {
+          id: "outlast",
+          title: "Outlast",
+          cover:
+            "https://upload.wikimedia.org/wikipedia/en/a/aa/Outlast_cover.jpg",
+          genre: "Survival · Horror",
+          category: "Horror",
+          platform: "PC, PS4, Xbox, Switch",
+          releaseDate: "2013-09-04",
+          developer: "Red Barrels",
+          desc: "Outlast adalah game first person survival di mana Anda bermain sebagai jurnalis Miles Upshur, yang harus menjelajahi Mount Massive Asylum, rumah sakit jiwa jahat.",
+          trailer: "https://www.youtube.com/embed/ZkSydla4sxo",
+        },
+        {
+          id: "alanwake2",
+          title: "Alan Wake II",
+          cover:
+            "https://image.api.playstation.com/vulcan/ap/rnd/202305/3116/b1641ab1b5ec0c8f76c44e59e9d8a1639c913c98c09d057f.jpg",
+          genre: "Horror · Thriller",
+          category: "Horror",
+          platform: "PC, PS5, Xbox",
+          releaseDate: "2023-10-27",
+          developer: "Remedy Entertainment",
+          desc: "Sequel horor psikologis yang lebih gelap dan kompleks. Menggabungkan elemen investigasi, sinematik, dan gameplay intens.",
+          trailer: "https://www.youtube.com/embed/dlQ3FeNu5Yw",
+        },
+        {
+          id: "dbd",
+          title: "Dead by Daylight",
+          cover:
+            "https://upload.wikimedia.org/wikipedia/en/b/b7/Dead_by_Daylight_Steam_header.jpg",
+          genre: "Survival · Horror",
+          category: "Horror",
+          platform: "PC, PS4, PS5, Xbox, Switch, Mobile",
+          releaseDate: "2016-06-14",
+          developer: "Behaviour Interactive",
+          desc: "Dead by Daylight adalah permainan horor multipemain asimetris di mana satu pemain mengendalikan Pembunuh dan empat pemain mengendalikan Korban.",
+          trailer: "https://www.youtube.com/embed/NYDnNyGgR5s",
+        },
+        {
+          id: "littlenightmare",
+          title: "Little Nightmare",
+          cover:
+            "https://image.api.playstation.com/cdn/EP0700/CUSA05952_00/cHwRJCrOnmqoNBGtMnYJjMeWZsEtTevGLrqI7dWLbP3UaquOi5WkRurFOAKqaBmc.png",
+          genre: "Horror · Puzzle · Adventure",
+          category: "Horror",
+          platform: "PC, PS4, PS5, Xbox, Nitendo Switch, Mobile",
+          releaseDate: "2017-04-28",
+          developer: "Tarsier Studios",
+          desc: "Little Nightmares adalah game petualangan horor platform-teka-teki tahun 2017 di mana Anda memandu seorang gadis kecil dan lapar bernama Six untuk melarikan diri dari kapal besar, misterius, dan menakutkan yang disebut ''The Maw''.",
+          trailer: "https://www.youtube.com/embed/aOadxZBsPiA",
+        },
+        {
+          id: "mhrise",
+          title: "Monster Hunter Rise",
+          cover:
+            "https://cdn.cloudflare.steamstatic.com/steam/apps/1446780/header.jpg",
+          genre: "Action RPG · Co-op",
+          category: "Action",
+          platform: "PC, Switch",
+          releaseDate: "2021-03-26",
+          developer: "Capcom",
+          desc: "Berburu monster besar dengan senjata beragam dan ekosistem dinamis. Fokus pada loop gameplay kooperatif dan perburuan.",
+          trailer: "https://www.youtube.com/embed/TdCec2GRg-w",
+        },
+        {
+          id: "re4remake",
+          title: "Resident Evil 4 (Remake)",
+          cover:
+            "https://cdn.cloudflare.steamstatic.com/steam/apps/2050650/header.jpg",
+          genre: "Horror · Action",
+          category: "Horror",
+          platform: "PC, PS4/5, Xbox",
+          releaseDate: "2023-03-24",
+          developer: "Capcom",
+          desc: "Remake modern dari klasik survival horror dengan visual & mekanik update. Atmosfer tegang dan desain musuh yang mengerikan kembali hadir.",
+          trailer: "https://www.youtube.com/embed/E69tKrfEQag",
+        },
+        {
+          id: "spiderman2",
+          title: "Marvel's Spider-Man 2",
+          cover:
+            "https://cdn.cloudflare.steamstatic.com/steam/apps/1817070/header.jpg",
+          genre: "Action · Adventure",
+          category: "Action",
+          platform: "PS5",
+          releaseDate: "2023-10-20",
+          developer: "Insomniac Games",
+          desc: "Petualangan Miles & Peter dengan narasi emosional dan traversal fluid. Dunia New York dipenuhi misi, side-activity, dan cerita karakter kuat.",
+          trailer: "https://www.youtube.com/embed/nq1M_Wc4FIc",
+        },
+        {
+          id: "ghostoftsushima",
+          title: "Ghost of Tsushima",
+          cover:
+            "https://cdn.mobygames.com/covers/11280846-ghost-of-tsushima-playstation-4-front-cover.jpg",
+          genre: "Action · Adventure",
+          category: "Action",
+          platform: "PS4, PS5",
+          releaseDate: "2020-07-17",
+          developer: "Sucker Punch Productions",
+          desc: "Petualangan samurai melawan invasi Mongol di Jepang feodal. Gameplay stealth dan duel katana yang memuaskan.",
+          trailer: "https://www.youtube.com/embed/Zbq7BnsQhrw",
+        },
+        {
+          id: "diablo4",
+          title: "Diablo IV",
+          cover:
+            "https://image.api.playstation.com/vulcan/ap/rnd/202211/3017/Oo1B84A7BLCT157YFSxjtwG0.png?w=440",
+          genre: "Action RPG · Loot",
+          category: "RPG",
+          platform: "PC, PS4/5, Xbox",
+          releaseDate: "2023-06-06",
+          developer: "Blizzard Entertainment",
+          desc: "Kembalinya seri Diablo dengan dunia gelap, loot-centric gameplay, dan pengembangan karakter mendalam.",
+          trailer: "https://www.youtube.com/embed/0SSYzl9fXOQ",
+        },
+        {
+          id: "phasmophobia",
+          title: "Phasmophobia",
+          cover:
+            "https://cdn.cloudflare.steamstatic.com/steam/apps/739630/header.jpg",
+          genre: "Horror · Investigation · Co-op",
+          category: "Horror",
+          platform: "PC, PS5, Xbox Series",
+          releaseDate: "2020-09-18",
+          developer: "Kinetic Games",
+          desc: "Game horror kooperatif 4 pemain dimana kamu menjadi pemburu hantu paranormal. Gunakan peralatan investigasi untuk mengidentifikasi jenis hantu sambil bertahan dari serangan supernatural.",
+          trailer: "https://www.youtube.com/embed/sRa9oeo5KiY",
+        },
+        {
+          id: "visage",
+          title: "Visage",
+          cover:
+            "https://pbs.twimg.com/profile_images/1044667599739478019/X220s0Ua_400x400.jpg",
+          genre: "Horror · Psychological · First-person",
+          category: "Horror",
+          platform: "PC, PS4, PS5, Xbox",
+          releaseDate: "2020-10-30",
+          developer: "SadSquare Studio",
+          desc: "Game horror psikologis yang sangat intens di rumah berhantu. Atmosfer menakutkan dan cerita yang dalam membuat pengalaman horor yang tak terlupakan.",
+          trailer: "https://www.youtube.com/embed/dY8AVTFbR9o",
+        },
+        {
+          id: "amnesia",
+          title: "Amnesia: The Dark Descent",
+          cover:
+            "https://cdn.cloudflare.steamstatic.com/steam/apps/57300/header.jpg",
+          genre: "Horror · Survival · Psychological",
+          category: "Horror",
+          platform: "PC, PS4, Xbox One",
+          releaseDate: "2010-09-08",
+          developer: "Frictional Games",
+          desc: "Horor survival klasik yang menegangkan. Kamu bangun tanpa ingatan di kastil gelap dan harus bertahan dari monster sambil mengungkap misteri masa lalumu.",
+          trailer: "https://www.youtube.com/embed/u1nY_5-UrY4",
+        },
+        {
+          id: "paperlily",
+          title: "Paper Lily",
+          cover:
+            "https://www.metacritic.com/a/img/catalog/provider/6/12/6-1-910806-52.jpg",
+          genre: "Horror · RPG · Psychological · Puzzle",
+          category: "Horror",
+          platform: "PC",
+          releaseDate: "2023-07-21",
+          developer: "Project Lily",
+          desc: "Game RPG horror psychological dengan aesthetic papercraft yang unik. Mengikuti cerita Aria, seorang gadis yang terperangkap dalam dunia mimpi yang gelap. Harus memecahkan puzzle yang menantang dan menghadapi trauma masa lalu sambil bertahan dari horor psychological yang mendalam. Dikembangkan dengan RPG Maker tetapi dengan kualitas yang sangat tinggi.",
+          trailer: "https://www.youtube.com/embed/XvP2SqM8XSo",
+        },
+        {
+          id: "aspacefortheunbound",
+          title: "A Space for the Unbound",
+          cover:
+            "https://www.qualbert.com/wp-content/uploads/2023/01/A-Space-for-the-Unbound-wallpaper-1170x850.jpg",
+          genre: "Adventure · RPG · Story-rich · Slice of Life",
+          category: "Adventure",
+          platform: "PC, PS4, PS5, Xbox, Nintendo Switch",
+          releaseDate: "2023-01-19",
+          developer: "Mojiken Studio",
+          desc: "Game adventure yang mengharukan berlatar di pedesaan Indonesia akhir 90-an. Mengikuti kisah Atma dan Raya, dua siswa SMA yang memiliki kemampuan magis untuk masuk ke 'Space' - dimensi yang merepresentasikan hati dan pikiran orang. Jelajahi kota kecil yang penuh nostalgia, selesaikan puzzle unik, dan ungkap misteri dunia yang perlahan hancur. Dengan visual pixel art yang stunning dan cerita yang deeply emotional tentang persahabatan, cinta, dan menghadapi anxiety.",
+          trailer: "https://www.youtube.com/embed/5QYVQhVd_-M",
+        },
+        {
+          id: "davethediver",
+          title: "Dave The Diver",
+          cover:
+            "https://cdn.cloudflare.steamstatic.com/steam/apps/1868140/header.jpg",
+          genre: "Adventure · Management · Simulation · RPG",
+          category: "Adventure",
+          platform: "PC, Nintendo Switch, PS4, PS5, Xbox",
+          releaseDate: "2023-06-28",
+          developer: "MINTROCKET",
+          desc: "Experience kehidupan ganda yang sempurna! Sebagai Dave, jelajahi misteri Blue Hole yang menakjubkan di siang hari dengan diving adventure yang penuh aksi, lalu kelola sushi restaurant yang booming di malam hari. Kombinasi genius antara underwater exploration, fishing, restaurant management, dan cerita mystery dengan humor yang hilarious. Pixel art yang stunning dan gameplay loop yang incredibly addictive membuat game ini must-play untuk semua fans adventure games!",
+          trailer: "https://www.youtube.com/embed/p85VHMpE0to",
+        },
+        {
+          id: "deltarune",
+          title: "DELTARUNE",
+          cover:
+            "https://cdn.cloudflare.steamstatic.com/steam/apps/1671210/header.jpg",
+          genre: "RPG · Adventure · Bullet Hell · Indie",
+          category: "RPG",
+          platform: "PC, PS4, Nintendo Switch, Xbox",
+          releaseDate: "2018-10-31",
+          developer: "Toby Fox",
+          desc: "Sequel spiritual Undertale dari genius Toby Fox. Masuklah ke Dark World dengan Kris, Susie, dan Ralsei dalam adventure yang memadukan turn-based combat dengan intense bullet hell mechanics. Setiap keputusan penting - jalur pacifist atau violent akan membawa konsekuensi berbeda. Dengan karakter yang unforgettable, humor yang sharp, dan emotional moments yang dalam, DELTARUNE adalah experience yang wajib untuk fans RPG dan storytelling yang meaningful.",
+          trailer: "https://www.youtube.com/embed/CN4ZcGJoZac",
+        },
+        {
+          id: "kofxv",
+          title: "King of Fighters XV",
+          cover:
+            "https://cdn1.epicgames.com/salesEvent/salesEvent/EGS_THEKINGOFFIGHTERSXV_SNKCORPORATION_S1_2560x1440-5d55ab8f79aeef9e9886bac3bbbf2204",
+          genre: "Fighting",
+          category: "Fighting",
+          platform: "PC, PS5, PS4, Xbox",
+          releaseDate: "2022-02-17",
+          developer: "SNK",
+          desc: "KOF XV adalah game pertarungan dari SNK yang melanjutkan kisah turnamen King of Fighters dengan roster besar berisi lebih dari 35 karakter.",
+          trailer: "https://www.youtube.com/embed/_o7Ip64-Sio",
+        },
+        {
+          id: "streetfighter6",
+          title: "Street Fighter 6",
+          cover:
+            "https://cdn.cloudflare.steamstatic.com/steam/apps/1364780/extras/13_Custom-Images_ST.png?t=1670548042",
+          genre: "Fighting",
+          category: "Fighting",
+          platform: "PC, PS4/5, Xbox",
+          releaseDate: "2023-06-02",
+          developer: "Capcom",
+          desc: "Fighting game modern dengan mode World Tour & mekanik Drive System. Visual lebih realistis namun mempertahankan feel Street Fighter.",
+          trailer: "https://www.youtube.com/embed/1INU3FOJsTw",
+        },
+        {
+          id: "narutostorm4",
+          title: "Naruto Shippuden: Ultimate Ninja Storm 4",
+          cover:
+            "https://cdn.cloudflare.steamstatic.com/steam/apps/349040/header.jpg",
+          genre: "Fighting · Anime · Arena Fighter · Story-Rich",
+          category: "Fighting",
+          platform: "PC, PS4, Xbox One, Nintendo Switch",
+          releaseDate: "2016-02-04",
+          developer: "CyberConnect2",
+          desc: "Masterpiece anime fighting game yang menjadi puncak series Ultimate Ninja Storm! Rasakan pertarungan epik akhir cerita Naruto Shippuden dengan visual stunning dan gameplay intens. Dengan roster 100+ karakter, mechanics yang accessible namun deep, dan story mode yang immersive, Storm 4 adalah pengalaman wajib untuk setiap fans Naruto dan fighting games. Feel like a ninja dalam pertarungan high-speed yang faithful kepada anime!",
+          trailer: "https://www.youtube.com/embed/9Vm4m15r2Xc",
+        },
+        {
+          id: "dragonballfighterz",
+          title: "Dragon Ball FighterZ",
+          cover:
+            "https://cdn.cloudflare.steamstatic.com/steam/apps/678950/header.jpg",
+          genre: "Fighting · Anime · 2.5D · Team Battle",
+          category: "Fighting",
+          platform: "PC, PS4, PS5, Xbox One, Xbox Series, Nintendo Switch",
+          releaseDate: "2018-01-26",
+          developer: "Arc System Works",
+          desc: "Masterpiece fighting game yang menangkap magic Dragon Ball dengan sempurna! Rasakan pertarungan epik Goku dan kawan-kawan dalam visual yang literally seperti anime yang bisa dikontrol. Dengan 3v3 team battles, mechanics yang accessible untuk pemula namun technically deep untuk pro players, serta roster yang penuh fan favorites, DBFZ bukan cuma game fighting terbaik di genre anime - ini salah satu fighting game terbaik PERIODE!",
+          trailer: "https://www.youtube.com/embed/oBI0MU73nlc",
+        },
+        {
+          id: "mortalkombat1",
+          title: "Mortal Kombat 1",
+          cover:
+            "https://assets-prd.ignimgs.com/2023/05/19/mk1cover-1684517222256.jpeg",
+          genre: "Fighting",
+          category: "Fighting",
+          platform: "PC, PS5, Xbox",
+          releaseDate: "2023-09-19",
+          developer: "NetherRealm Studios",
+          desc: "Reboot Mortal Kombat dengan roster baru dan grafis intens. Pertarungan brutal, mode cerita sinematik, dan fitur kompetitif.",
+          trailer: "https://www.youtube.com/embed/UZ6eFEjFfJ0",
+        },
+        {
+          id: "tekken8",
+          title: "Tekken 8",
+          cover:
+            "https://gaming-cdn.com/images/products/9579/616x353/tekken-8-pc-game-steam-cover.jpg",
+          genre: "Fighting",
+          category: "Fighting",
+          platform: "PS5, Xbox Series, PC",
+          releaseDate: "2024-01-26",
+          developer: "Bandai Namco Studios",
+          desc: "Tekken 8 adalah game pertarungan yang mengembangkan kisah Jin Kazama dengan grafis memukau berkat Unreal Engine 5.",
+          trailer: "https://www.youtube.com/embed/_MM4clV2qjE",
+        },
+        {
+          id: "codbo2",
+          title: "Call of Duty: Black Ops II",
+          cover:
+            "https://i.pinimg.com/564x/07/db/72/07db72be54bdbb701a080a0040133632.jpg",
+          genre: "FPS · Action",
+          category: "FPS",
+          platform: "PC, Xbox, PS3",
+          releaseDate: "2012-11-12",
+          developer: "Treyarch",
+          desc: "Call of Duty 2 adalah game tembak-menembak dengan kampanye pemain tunggal dengan alur cerita bercabang berdasarkan pilihan pemain.",
+          trailer: "https://www.youtube.com/embed/x3tedlWs1XY",
+        },
+        {
+          id: "overwatch2",
+          title: "Overwatch 2",
+          cover:
+            "https://cdn.mos.cms.futurecdn.net/98jHmZrtrVxPiMjjEB8ghF-1200-80.jpg",
+          genre: "FPS · Free to Play",
+          category: "FPS",
+          platform: "PC, PS4, PS5, Xbox, Switch",
+          releaseDate: "2022-10-04",
+          developer: "Blizzard Entertainment",
+          desc: "Overwatch 2 adalah game tembak-menembak tim 5v5 dari Blizzard Entertainment, di mana setiap hero memiliki kemampuan unik.",
+          trailer: "https://www.youtube.com/embed/dZl1yGUetjI",
+        },
+        {
+          id: "fortnite",
+          title: "Fortnite Battle Royale",
+          cover:
+            "https://upload.wikimedia.org/wikipedia/en/a/ae/Fortnite_Save_The_World.jpg",
+          genre: "Battle Royale · Shooter",
+          category: "Battle Royale",
+          platform: "PC, PS4, PS5, Xbox, Mobile",
+          releaseDate: "2017-07-25",
+          developer: "Epic Games",
+          desc: "Fortnite adalah game battle royale di mana 100 pemain bertarung hingga tersisa satu pemenang. Ciri khasnya adalah mekanik membangun struktur.",
+          trailer: "https://www.youtube.com/embed/qpKtzf5fXn4",
+        },
+        {
+          id: "pointblank",
+          title: "Point Blank",
+          cover:
+            "https://images.igdb.com/igdb/image/upload/t_cover_big/co3wph.webp",
+          genre: "FPS · Online Multiplayer",
+          category: "FPS",
+          platform: "PC",
+          releaseDate: "2008-04-11",
+          developer: "Zepetto",
+          desc: "Point Blank adalah game FPS online buatan Zepetto yang menghadirkan pertempuran cepat antara dua kubu: Free Rebels dan CT-Force.",
+          trailer: "https://www.youtube.com/embed/l5F1q2z8HkY",
+        },
+        {
+          id: "valorant",
+          title: "Valorant",
+          cover:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSqEJcsyEWxiLe_Fv5dOyYAK1tWOAjjPcMlvg&s",
+          genre: "Tactical Shooter · FPS",
+          category: "FPS",
+          platform: "PC",
+          releaseDate: "2020-06-02",
+          developer: "Riot Games",
+          desc: "Valorant adalah game First-Person Shooter taktis 5v5 buatan Riot Games, di mana dua tim saling bertarung untuk menanam atau menjinakkan Spike.",
+          trailer: "https://www.youtube.com/embed/6nKzziP2lxw",
+        },
+        {
+          id: "apexlegends",
+          title: "Apex Legends",
+          cover:
+            "https://cdn.cloudflare.steamstatic.com/steam/apps/1172470/header.jpg",
+          genre: "Battle Royale · FPS · Hero Shooter",
+          category: "Battle Royale",
+          platform: "PC, PS4, PS5, Xbox, Switch, Mobile",
+          releaseDate: "2019-02-04",
+          developer: "Respawn Entertainment",
+          desc: "Battle royale futuristik dengan karakter 'Legends' yang memiliki ability unik. Movement fluid, ping system revolusioner, dan gunplay yang memuaskan. Salah satu BR terbaik untuk teamwork.",
+          trailer: "https://www.youtube.com/embed/innmNewjkuk",
+        },
+        {
+          id: "warzone",
+          title: "Call of Duty: Warzone",
+          cover:
+            "https://cdn.cloudflare.steamstatic.com/steam/apps/1962663/header.jpg",
+          genre: "Battle Royale · FPS · Military",
+          category: "Battle Royale",
+          platform: "PC, PS4, PS5, Xbox",
+          releaseDate: "2020-03-10",
+          developer: "Infinity Ward, Raven Software",
+          desc: "Battle royale gratis dari franchise Call of Duty. Gunplay klasik CoD, map besar Verdansk/Caldera, dan fitur Gulag yang memungkinkan respawn. Mendukung 150 pemain per match.",
+          trailer: "https://www.youtube.com/embed/0E44DClsX5Q",
+        },
+        {
+          id: "pubg",
+          title: "PUBG: Battlegrounds",
+          cover:
+            "https://cdn.cloudflare.steamstatic.com/steam/apps/578080/header.jpg",
+          genre: "Battle Royale · FPS · Survival",
+          category: "Battle Royale",
+          platform: "PC, PS4, Xbox, Mobile",
+          releaseDate: "2017-12-20",
+          developer: "PUBG Studios",
+          desc: "Game yang mempopulerkan genre battle royale. Realistic military simulation, looting intensif, dan tension tinggi saat zone menyempit. The original BR experience.",
+          trailer: "https://www.youtube.com/embed/uCd6tbUAy6o",
+        },
+        {
+          id: "assettocorsa",
+          title: "Assetto Corsa Competizione",
+          cover:
+            "https://images.igdb.com/igdb/image/upload/t_cover_big_2x/co790f.jpg",
+          genre: "Racing · Simulation · Sports",
+          category: "Racing",
+          platform: "PC, PS4, PS5, Xbox",
+          releaseDate: "2019-05-29",
+          developer: "Kunos Simulazioni",
+          desc: "Assetto Corsa Competizione adalah simulator balap GT resmi yang dengan setia menciptakan kembali Seri Blancpain GT dengan grafis fidelitas tinggi, fisika realistis, dan trek akurat.",
+          trailer: "https://www.youtube.com/embed/CYncAnd31Q8",
+        },
+        {
+          id: "nfsheat",
+          title: "Need for Speed: Heat",
+          cover:
+            "https://image.api.playstation.com/vulcan/ap/rnd/202210/3121/XemhVDBuAEVrQXUkJF57ZsdX.jpg",
+          genre: "Racing · Open World",
+          category: "Racing",
+          platform: "PC, PS4, Xbox One",
+          releaseDate: "2019-11-08",
+          developer: "Ghost Games",
+          desc: "Need For Speed:Heat adalah game balapan jalanan dunia terbuka di kota Palm City.",
+          trailer: "https://www.youtube.com/embed/zBo-MsH_EIk",
+        },
+        {
+          id: "iracing",
+          title: "iRacing",
+          cover:
+            "https://cdn.mobygames.com/covers/1564801-iracing-windows-front-cover.jpg",
+          genre: "Racing · Sports",
+          category: "Racing",
+          platform: "PC",
+          releaseDate: "2008-08-26",
+          developer: "iRacing.com Motorsport Simulations",
+          desc: "iRacing adalah game simulasi balapan daring berbasis langganan untuk PC, yang dikenal karena realismenya yang ekstrem.",
+          trailer: "https://www.youtube.com/embed/tYZeBrTvOhc",
+        },
+        {
+          id: "forzahorizon5",
+          title: "Forza Horizon 5",
+          cover:
+            "https://traxion.gg/wp-content/uploads/2021/08/Forza-Horizon-5-game-cover.jpg",
+          genre: "Racing · Open World",
+          category: "Racing",
+          platform: "PC, Xbox",
+          releaseDate: "2021-11-09",
+          developer: "Playground Games",
+          desc: "Forza Horizon adalah game balapan dunia terbuka buatan Playground Games di bawah lisensi Microsoft.",
+          trailer: "https://www.youtube.com/embed/FYH9n37B7Yw",
+        },
+        {
+          id: "blur",
+          title: "Blur",
+          cover:
+            "https://preview.redd.it/blur-2010-cover-art-uncropped-v0-7d7w5iaserwb1.png?auto=webp&s=5089a3aa5f63fc7bb7397bae4b6d8eb0742abcd4",
+          genre: "Racing · Action",
+          category: "Racing",
+          platform: "PC, PlayStation 3, Xbox 360",
+          releaseDate: "2010-05-25",
+          developer: "Bizarre Creations",
+          desc: "Blur adalah game balapan arcade penuh aksi buatan Bizarre Creations, yang menggabungkan kecepatan tinggi dengan senjata futuristik.",
+          trailer: "https://www.youtube.com/embed/yBDLMzwMAdc",
+        },
+        {
+          id: "rf2",
+          title: "rFactor 2",
+          cover:
+            "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/365960/capsule_616x353.jpg",
+          genre: "Simulation · Sports · Racing",
+          category: "Racing",
+          platform: "PC",
+          releaseDate: "2013-03-27",
+          developer: "Studio 397",
+          desc: "rFactor 2 adalah game simulasi balap PC yang realistis dan dapat disesuaikan yang dikenal karena fisika canggihnya, cuaca dinamis dan siklus siang-malam, serta opsi multipemain yang luas.",
+          trailer: "https://www.youtube.com/embed/mO3o1N5MexU",
+        },
+        {
+          id: "genshinimpact",
+          title: "Genshin Impact",
+          cover:
+            "https://cdn.mobygames.com/covers/9213927-genshin-impact-playstation-4-front-cover.jpg",
+          genre: "Adventure · Action RPG",
+          category: "RPG",
+          platform: "PC, PS4, PS5, Xbox, Mobile",
+          releaseDate: "2020-09-28",
+          developer: "HoYoverse",
+          desc: "Genshin Impact adalah RPG aksi dunia terbuka yang gratis untuk dimainkan, di mana pemain mengendalikan seorang pengembara.",
+          trailer: "https://www.youtube.com/embed/HLUY1nICQRY",
+        },
+        {
+          id: "zenlesszonezero",
+          title: "Zenless Zone Zero",
+          cover:
+            "https://images.igdb.com/igdb/image/upload/t_cover_big_2x/co90je.jpg",
+          genre: "Action RPG · Urban Fantasy · Roguelite · Anime",
+          category: "RPG",
+          platform: "PC, PS5, iOS, Android",
+          releaseDate: "2024-07-04",
+          developer: "HoYoverse",
+          desc: "Masterpiece action RPG terbaru dari HoYoverse! Masuklah ke New Eridu, kota pasca-apokaliptik yang penuh gaya dan misteri. Kumpulkan tim 'Proxies' karismatik, jelajahi dimensi paralel 'Hollows', dan hadapi ancaman supernatural dengan combat real-time yang intens. Dengan visual anime yang memukau, soundtrack yang funky, dan cerita misterius tentang dunia yang hancur, ZZZ menawarkan pengalaman urban fantasy yang segar dan addictive!",
+          trailer: "https://www.youtube.com/embed/kdAZIjzSZaM",
+        },
+        {
+          id: "persona5royal",
+          title: "Persona 5 Royal",
+          cover:
+            "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1687950/capsule_616x353.jpg?t=1733297467",
+          genre: "JRPG · Turn-based",
+          category: "RPG",
+          platform: "PS4, PS5, PC, Nintendo Switch",
+          releaseDate: "2019-10-31",
+          developer: "Atlus",
+          desc: "Persona 5 Royal adalah versi diperluas dari Persona 5, menghadirkan cerita tambahan, karakter baru, dan mekanik gameplay yang diperbarui.",
+          trailer: "https://www.youtube.com/embed/SKpSpvFCZRw",
+        },
+        {
+          id: "footballmanager2024",
+          title: "Football Manager 2024",
+          cover:
+            "https://cdn.cloudflare.steamstatic.com/steam/apps/2252570/header.jpg",
+          genre: "Sports · Simulation · Management · Strategy",
+          category: "Sports",
+          platform: "PC, PS5, Xbox Series, Nintendo Switch, Mobile",
+          releaseDate: "2023-11-06",
+          developer: "Sports Interactive",
+          desc: "Puncak football management simulation! Ambil alih klub favoritmu dan buktikan diri sebagai managerial genius. Dengan database paling comprehensive di gaming, match engine yang terus disempurnakan, dan kedalaman taktis yang tak tertandingi, FM2024 menawarkan pengalaman paling authentic menjadi manager football. Dari transfer saga sampai tactical masterclasses - ini adalah game yang membuat kamu berkata 'Just one more match!' sampai jam 3 pagi!",
+          trailer: "https://www.youtube.com/embed/QvyMqBtiJDg",
+        },
+        {
+          id: "eafc25",
+          title: "EAFC 25",
+          cover:
+            "https://image.api.playstation.com/vulcan/ap/rnd/202503/2520/f3c135f8ebdc50b782c6f5f02b27130b499e22847f05aee6.png",
+          genre: "Sports",
+          category: "Sports",
+          platform: "PC, PS4, PS5, Xbox, Mobile",
+          releaseDate: "2024-09-27",
+          developer: "EA Sports",
+          desc: "EAFC 25 (sebelumnya FIFA) adalah game sepak bola populer dari EA Sports yang menghadirkan gameplay realistis.",
+          trailer: "https://www.youtube.com/embed/pBM2xyco_Kg",
+        },
+        {
+          id: "efootball",
+          title: "eFootball",
+          cover:
+            "https://www.konami.com/kde_cms/eu_publish/uploads/efootball2024_mainvisual_messi-600x338.jpg",
+          genre: "Sports",
+          category: "Sports",
+          platform: "PC, PS4, PS5, Xbox, Mobile",
+          releaseDate: "2021-09-30",
+          developer: "Konami",
+          desc: "eFootball adalah game simulasi sepak bola buatan Konami yang menjadi penerus seri Pro Evolution Soccer (PES).",
+          trailer: "https://www.youtube.com/embed/7LH1IvXl6_8",
+        },
+        {
+          id: "nba2k25",
+          title: "NBA 2K25",
+          cover:
+            "https://upload.wikimedia.org/wikipedia/en/thumb/2/2f/NBA_2K25_cover_art.jpg/250px-NBA_2K25_cover_art.jpg",
+          genre: "Sports · Simulation",
+          category: "Sports",
+          platform: "PC, PS4, PS5, Xbox, Switch",
+          releaseDate: "2024-09-06",
+          developer: "Visual Concepts",
+          desc: "NBA 2K25 adalah edisi terkini dalam seri simulasi basket, yang menampilkan realisme permainan yang ditingkatkan.",
+          trailer: "https://www.youtube.com/embed/zwQ9RjfvJN0",
+        },
+        {
+          id: "rocketleague",
+          title: "Rocket League",
+          cover:
+            "https://cdn.cloudflare.steamstatic.com/steam/apps/252950/header.jpg",
+          genre: "Sports · Racing · Soccer · Physics",
+          category: "Sports",
+          platform: "PC, PS4, PS5, Xbox, Nintendo Switch",
+          releaseDate: "2015-07-07",
+          developer: "Psyonix",
+          desc: "Soccer dengan rocket-powered cars! Game sports paling unik dan addictive. Gabungkan skill driving dengan teamwork dalam pertandingan soccer high-octane. Easy to learn, impossible to master. Competitive scene yang thriving dan updates reguler!",
+          trailer: "https://www.youtube.com/embed/SgSX3gOrj60",
+        },
+        {
+          id: "bindingofisaac",
+          title: "The Binding of Isaac: Repentance",
+          cover:
+            "https://cdn1.epicgames.com/dbf5337d024e457bac68f2059112da86/offer/EGS_TheBindingofIsaacRepentance_NicalisIncEdmundMcmillen_S2-1200x1600-eb480826546ffb2ed1560ceec262b615.jpg",
+          genre: "Roguelike · Twin-stick Shooter · Dark",
+          category: "Roguelike",
+          platform: "PC, PS5, Xbox Series, Nintendo Switch",
+          releaseDate: "2021-03-31",
+          developer: "Nicalis, Edmund McMillen",
+          desc: "Roguelike legendaris dengan content yang massive! Jelajahi basement sebagai Isaac, temukan item gila, dan hadapi bos grotesque. Dengan ribuan item combinations, multiple characters, dan secrets yang tak terhitung, ini adalah roguelike dengan replay value tertinggi!",
+          trailer: "https://www.youtube.com/embed/A_C90i1jVzY",
+        },
+        {
+          id: "deadcells",
+          title: "Dead Cells",
+          cover:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSZjRAf0L1I6sCQ-8O-W_KxMMJKBfc98EAFQQ&s",
+          genre: "Action · Roguelike",
+          category: "Roguelike",
+          platform: "PC, PS4, Xbox, Switch, Mobile",
+          releaseDate: "2018-08-07",
+          developer: "Motion Twin",
+          desc: "Dead Cells adalah game aksi 2D bergaya roguelike dan Metroidvania buatan Motion Twin.",
+          trailer: "https://www.youtube.com/embed/RvGaSPTcTxc",
+        },
+        {
+          id: "hollowknight",
+          title: "Hollow Knight",
+          cover:
+            "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/367520/capsule_616x353.jpg?t=1695270428",
+          genre: "Action · Adventure",
+          category: "Metroidvania",
+          platform: "PC, PS4, Xbox, Switch",
+          releaseDate: "2017-02-24",
+          developer: "Team Cherry",
+          desc: "Hollow Knight adalah game Metroidvania aksi-petualangan 2D yang mana pemain mengendalikan seorang prajurit serangga.",
+          trailer: "https://www.youtube.com/embed/UAO2urG23S4",
+        },
+        {
+          id: "silksong",
+          title: "Silksong",
+          cover:
+            "https://upload.wikimedia.org/wikipedia/id/4/4f/Hollow_Knight_Silksong_logo_%28black%29.jpg",
+          genre: "Action · Adventure",
+          category: "Metroidvania",
+          platform: "PC, Switch, PlayStation, Xbox",
+          releaseDate: "TBA",
+          developer: "Team Cherry",
+          desc: "Silksong adalah sekuel dari Hollow Knight buatan Team Cherry, dengan karakter utama baru bernama Hornet.",
+          trailer: "https://www.youtube.com/embed/6XGeJwsUP9c",
+        },
+        {
+          id: "oriwillofthewisps",
+          title: "Ori and the Will of the Wisps",
+          cover:
+            "https://cdn.cloudflare.steamstatic.com/steam/apps/1057090/header.jpg",
+          genre: "Platformer · Adventure · Metroidvania",
+          category: "Metroidvania",
+          platform: "PC, Xbox, Switch",
+          releaseDate: "2020-03-11",
+          developer: "Moon Studios",
+          desc: "Sequel yang lebih baik dari Ori pertama. Visual stunning seperti lukisan hidup, gameplay fluid, dan cerita emosional. Kombinasi platforming dan combat yang sempurna.",
+          trailer: "https://www.youtube.com/embed/2reK8k8nwBc",
+        },
+        {
+          id: "bloodstained",
+          title: "Bloodstained: Ritual of the Night",
+          cover:
+            "https://cdn.cloudflare.steamstatic.com/steam/apps/692850/header.jpg",
+          genre: "Action · RPG · Metroidvania",
+          category: "Metroidvania",
+          platform: "PC, PS4, Xbox, Switch",
+          releaseDate: "2019-06-18",
+          developer: "ArtPlay",
+          desc: "Spiritual successor Castlevania dari Koji Igarashi. RPG elements yang dalam, ratusan senjata dan skill, serta kastil raksasa yang penuh rahasia.",
+          trailer: "https://www.youtube.com/embed/d79KArgmgcc",
+        },
+        {
+          id: "blasphemous",
+          title: "Blasphemous",
+          cover:
+            "https://cdn.cloudflare.steamstatic.com/steam/apps/774361/header.jpg",
+          genre: "Action · Platformer · Metroidvania",
+          category: "Metroidvania",
+          platform: "PC, PS4, Xbox, Switch",
+          releaseDate: "2019-09-10",
+          developer: "The Game Kitchen",
+          desc: "Metroidvania dengan tema religious horror yang dark. Art style pixel gothic yang unik, combat brutal, dan dunia yang penuh dengan simbolisme agama yang mengerikan.",
+          trailer: "https://www.youtube.com/embed/T3SxYMu5qGY",
+        },
+        {
+          id: "guacamelee",
+          title: "Guacamelee!",
+          cover:
+            "https://cdn.cloudflare.steamstatic.com/steam/apps/214770/header.jpg",
+          genre: "Metroidvania · Beat 'em up · Comedy",
+          category: "Metroidvania",
+          platform: "PC, PS4, Xbox, Switch",
+          releaseDate: "2013-08-08",
+          developer: "DrinkBox Studios",
+          desc: "Metroidvania dengan tema Mexican folklore yang colorful. Combat brawler yang menyenangkan, humor yang kocak, dan co-op lokal untuk 2 pemain.",
+          trailer: "https://www.youtube.com/embed/6hGPyHacsG0",
+        },
+        {
+          id: "minecraft",
+          title: "Minecraft",
+          cover:
+            "https://upload.wikimedia.org/wikipedia/en/b/b6/Minecraft_2024_cover_art.png",
+          genre: "Sandbox · Survival",
+          category: "Sandbox",
+          platform: "PC, PlayStation, Xbox, Switch, Mobile",
+          releaseDate: "2011-11-18",
+          developer: "Mojang Studios",
+          desc: "Minecraft adalah game sandbox kreatif buatan Mojang Studios, di mana pemain bisa menjelajah, membangun, dan bertahan hidup.",
+          trailer: "https://www.youtube.com/embed/MmB9b5njVbA",
+        },
+        {
+          id: "roblox",
+          title: "Roblox",
+          cover:
+            "https://images.rbxcdn.com/5348266ea6c5e67b19d6a814cbbb70f6.jpg",
+          genre: "Sandbox · Online Multiplayer",
+          category: "Sandbox",
+          platform: "PC, Xbox, Mobile",
+          releaseDate: "2006-09-01",
+          developer: "Roblox Corporation",
+          desc: "Roblox adalah platform game online yang memungkinkan pemain membuat, berbagi, dan memainkan game buatan pengguna lain.",
+          trailer: "https://www.youtube.com/embed/eAvXhNlO-rA",
+        },
+        {
+          id: "garrysmod",
+          title: "Garry's Mod",
+          cover:
+            "https://static.wikia.nocookie.net/slyarmy/images/3/3e/GMOD.png",
+          genre: "Sandbox · Physics · Creation",
+          category: "Sandbox",
+          platform: "PC",
+          releaseDate: "2006-11-29",
+          developer: "Facepunch Studios",
+          desc: "Ultimate sandbox experience! Tanpa objectives, tanpa rules - hanya physics dan creativity-mu. Build contraptions gila, create machinima, atau main game modes dengan community. Dengan Source Engine dan workshop support, possibilities-nya literally infinite!",
+          trailer: "https://www.youtube.com/embed/kgXVLw6qpFM",
+        },
+        {
+          id: "cs2",
+          title: "Counter Strike 2",
+          cover:
+            "https://blix.gg/wp-content/uploads/2024/10/885493db55567467.jpeg",
+          genre: "Tactical Shooter · FPS",
+          category: "FPS",
+          platform: "PC",
+          releaseDate: "2023-09-27",
+          developer: "Valve",
+          desc: "Counter-Strike 2 adalah versi terbaru dari seri legendaris Counter-Strike yang dikembangkan oleh Valve menggunakan Source 2 Engine.",
+          trailer: "https://www.youtube.com/embed/c80dVYcL69E",
+        },
+        {
+          id: "sifu",
+          title: "Sifu",
+          cover:
+            "https://upload.wikimedia.org/wikipedia/en/e/e3/Sifu_cover_art.jpg",
+          genre: "Fighting · Indie",
+          category: "Fighting",
+          platform: "PS4, PS5, PC, Xbox",
+          releaseDate: "2022-02-08",
+          developer: "Sloclap",
+          desc: "Sifu adalah game pertarungan aksi penuh gaya di mana Anda berperan sebagai seorang murid kung fu muda.",
+          trailer: "https://www.youtube.com/embed/1FQ1YO3Ks2U",
+        },
+        {
+          id: "dota2",
+          title: "DOTA 2",
+          cover:
+            "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/570/capsule_616x353.jpg?t=1757000652",
+          genre: "Multiplayer · Action RPG",
+          category: "MOBA",
+          platform: "PC",
+          releaseDate: "2013-07-09",
+          developer: "Valve",
+          desc: "Dota 2 adalah game MOBA yang dikembangkan oleh Valve Corporation sebagai sekuel dari mod populer Defense of the Ancients.",
+          trailer: "https://www.youtube.com/embed/SmnqsdeHFT0",
+        },
+        {
+          id: "honorofkings",
+          title: "Honor of Kings",
+          cover:
+            "https://cdn1.epicgames.com/spt-assets/e0c86a9863e240bd94298544c653f464/honor-of-kings-1uz5g.png",
+          genre: "MOBA · Strategy · Competitive · Mobile",
+          category: "MOBA",
+          platform: "Mobile",
+          releaseDate: "2015-11-26",
+          developer: "TiMi Studio Group",
+          desc: "Raksasa MOBA mobile dengan player base terbesar di dunia! Honor of Kings menawarkan pengalaman MOBA 5v5 yang dioptimalkan sempurna untuk perangkat mobile dengan pertandingan cepat 10-15 menit. Meski sangat dominan di China, game ini menunjukkan kualitas technical dan esports infrastructure yang impressive. Recommended untuk pemain di region Asia yang mencari competitive mobile MOBA dengan polish tinggi dan update konsisten.",
+          trailer: "https://www.youtube.com/embed/dF9WPvRtKJw",
+        },
+        {
+          id: "leagueoflegends",
+          title: "League of Legends",
+          cover:
+            "https://i.pinimg.com/736x/20/54/b6/2054b617ac11f24e23d62e05f85303d4.jpg",
+          genre: "MOBA · Strategy · Competitive",
+          category: "MOBA",
+          platform: "PC, Mobile",
+          releaseDate: "2009-10-27",
+          developer: "Riot Games",
+          desc: "MOBA paling populer di dunia dengan 140+ champion unik. Tim 5v5 bertarung untuk menghancurkan Nexus lawan. Kompetitif, strategis, dan terus berkembang.",
+          trailer: "https://www.youtube.com/embed/vzHrjOMfHPY",
+        },
+        {
+          id: "smite",
+          title: "SMITE",
+          cover:
+            "https://cdn.cloudflare.steamstatic.com/steam/apps/386360/header.jpg",
+          genre: "MOBA · Action · Mythology",
+          category: "MOBA",
+          platform: "PC, PS4, Xbox, Switch",
+          releaseDate: "2014-03-25",
+          developer: "Hi-Rez Studios",
+          desc: "MOBA dengan perspektif third-person yang unik. Kontrol dewa-dewa dari berbagai mitologi dunia dalam pertempuran epik 5v5.",
+          trailer: "https://www.youtube.com/embed/khsjzariacQ",
+        },
+        {
+          id: "heroesofthestorm",
+          title: "Heroes of the Storm",
+          cover:
+            "https://gaming-cdn.com/images/products/525/616x353/heroes-of-the-storm-pc-mac-game-battle-net-cover.jpg",
+          genre: "MOBA · Strategy · Blizzard",
+          category: "MOBA",
+          platform: "PC",
+          releaseDate: "2015-06-02",
+          developer: "Blizzard Entertainment",
+          desc: "MOBA dari Blizzard yang mempertemukan karakter iconic dari Warcraft, Diablo, StarCraft, dan Overwatch. Map yang beragam dan objective-based gameplay.",
+          trailer: "https://www.youtube.com/embed/0ecv0bT9DEo",
+        },
+        {
+          id: "blackmythwukong",
+          title: "Black Myth Wukong",
+          cover:
+            "https://cdn1.epicgames.com/spt-assets/ca9ef1bcf2f54043baac351366aec677/black-myth-wukong-jjjfw.png",
+          genre: "Action · Adventure",
+          category: "Action",
+          platform: "PS5, PC, Xbox",
+          releaseDate: "2024-08-20",
+          developer: "Game Science",
+          desc: "Black Myth Wukong adalah RPG aksi Tiongkok oleh Game Science, yang berakar pada novel klasik Journey to the West.",
+          trailer: "https://www.youtube.com/embed/u83VdXAVq08",
+        },
+        {
+          id: "subnautica",
+          title: "Subnautica Below Zero",
+          cover:
+            "https://static.wikia.nocookie.net/subnautica/images/f/f4/BelowZeroHeroImage.jpg",
+          genre: "Survival · Adventure",
+          category: "Survival",
+          platform: "PC, PS4, PS5, Xbox, Switch",
+          releaseDate: "2021-05-14",
+          developer: "Unknown Worlds Entertainment",
+          desc: "Subnautica: Below Zero adalah game petualangan bertahan hidup orang pertama di dunia terbuka.",
+          trailer: "https://www.youtube.com/embed/rdix1XxaZyU",
+        },
+        {
+          id: "zeldabotw",
+          title: "The Legend of Zelda: Breath of the Wild",
+          cover:
+            "https://upload.wikimedia.org/wikipedia/en/c/c6/The_Legend_of_Zelda_Breath_of_the_Wild.jpg",
+          genre: "Adventure · Open World · Action",
+          category: "Adventure",
+          platform: "Nintendo Switch, Wii U",
+          releaseDate: "2017-03-03",
+          developer: "Nintendo EPD",
+          desc: "Revolutionary open-world adventure dimana kamu bebas menjelajahi Hyrule yang vast. Physics system yang innovative, puzzle kreatif di shrine, dan freedom absolut dalam exploration. Setiap gunung bisa didaki, setiap misteri bisa diungkap.",
+          trailer: "https://www.youtube.com/embed/zw47_q9wbBE",
+        },
+        {
+          id: "supersmashbrosultimate",
+          title: "Super Smash Bros. Ultimate",
+          cover:
+            "https://cdn.mobygames.com/covers/7432106-super-smash-bros-ultimate-nintendo-switch-front-cover.jpg",
+          genre: "Fighting · Platform Fighter · Crossover · Party",
+          category: "Fighting",
+          platform: "Nintendo Switch",
+          releaseDate: "2018-12-07",
+          developer: "Bandai Namco Studios, Sora Ltd.",
+          desc: "THE ultimate crossover fighting experience! Kumpulkan seluruh roster gaming legends dalam pertarungan epik yang mendefinisikan ulang genre fighting. Dengan 89+ karakter dari Mario sampai Sephiroth, mechanics yang sempurna untuk pemula dan pro players, serta content yang practically infinite, Smash Ultimate adalah masterpiece yang wajib dimainkan setiap gamer. Bukan sekedar fighting game - ini celebration of gaming history!",
+          trailer: "https://www.youtube.com/embed/WShCN-AYHqA",
+        },
+        {
+          id: "lifeisstrange",
+          title: "Life is Strange",
+          cover:
+            "https://cdn.cloudflare.steamstatic.com/steam/apps/319630/header.jpg",
+          genre: "Adventure · Story-rich · Choice Matters",
+          category: "Adventure",
+          platform: "PC, PS4, Xbox, Switch",
+          releaseDate: "2015-01-30",
+          developer: "Dontnod Entertainment",
+          desc: "Narrative adventure yang emotional tentang Max Caulfield, siswa fotografi yang discover kemampuan rewind time. Save hometown dari disaster sambil menghadapi konsekuensi setiap pilihan. Storytelling yang powerful dan karakter yang memorable.",
+          trailer: "https://www.youtube.com/embed/AURVxvIZrmU",
+        },
+        {
+          id: "theforest",
+          title: "The Forest",
+          cover:
+            "https://cdn.cloudflare.steamstatic.com/steam/apps/242760/header.jpg",
+          genre: "Survival · Horror · Open World",
+          category: "Survival",
+          platform: "PC, PS4",
+          releaseDate: "2018-04-30",
+          developer: "Endnight Games",
+          desc: "Survival horror di pulau berpenghuni kanibal. Bangun basis, kumpulkan resources, dan bertahan dari serangan mutant sambil mencari anak yang diculik.",
+          trailer: "https://www.youtube.com/embed/7mwn5U2PNvk",
+        },
+        {
+          id: "greenhell",
+          title: "Green Hell",
+          cover:
+            "https://cdn.cloudflare.steamstatic.com/steam/apps/815370/header.jpg",
+          genre: "Survival · Simulation · Open World",
+          category: "Survival",
+          platform: "PC, PS4, Xbox, Switch",
+          releaseDate: "2019-09-05",
+          developer: "Creepy Jar",
+          desc: "Simulasi survival realistis di hutan Amazon. Kelaparan, penyakit, predator, dan kesehatan mental menjadi tantangan dalam bertahan hidup.",
+          trailer: "https://www.youtube.com/embed/DmDLagkxe_Q",
+        },
+        {
+          id: "rust",
+          title: "Rust",
+          cover:
+            "https://cdn.cloudflare.steamstatic.com/steam/apps/252490/header.jpg",
+          genre: "Survival · Multiplayer · PvP",
+          category: "Survival",
+          platform: "PC, PS4, Xbox",
+          releaseDate: "2018-02-08",
+          developer: "Facepunch Studios",
+          desc: "Survival multiplayer brutal dimana pemain bertarung untuk bertahan hidup dari elemen dan pemain lain. Bangun basis, kumpulkan senjata, dan bentuk aliansi.",
+          trailer: "https://www.youtube.com/embed/LGcECozNXEw",
+        },
+        {
+          id: "observer",
+          title: "Observer: System Redux",
+          cover:
+            "https://cdn1.epicgames.com/71e66acf6bb34733bd98514ebf9fcaf8/offer/EGS_ObserverSystemRedux_BlooberTeam_S1-2560x1440-c933335b5dcacc809dcfcf5bbff47a67.jpg",
+          genre: "Survival · Horror",
+          category: "Action",
+          platform: "PC, PS4, PS5, Xbox",
+          releaseDate: "2020-11-10",
+          developer: "Bloober Team",
+          desc: "Observer adalah game horor cyberpunk orang pertama di mana pemain mengendalikan Daniel Lazarski, seorang detektif saraf elit.",
+          trailer: "https://www.youtube.com/embed/vK14E5J-XgQ",
+        },
+        {
+          id: "stardewvalley",
+          title: "Stardew Valley",
+          cover:
+            "https://cdn.cloudflare.steamstatic.com/steam/apps/413150/header.jpg",
+          genre: "Farming · Simulation · RPG",
+          category: "Simulation",
+          platform: "PC, PS4, Xbox, Switch, Mobile",
+          releaseDate: "2016-02-26",
+          developer: "ConcernedApe",
+          desc: "Game farming simulator yang relaxing dimana kamu mewarisi kebun kakek dan membangun kehidupan baru di pedesaan.",
+          trailer: "https://www.youtube.com/embed/ot7uXNQskhs",
+        },
+        {
+          id: "citiesskylines",
+          title: "Cities: Skylines",
+          cover:
+            "https://cdn.cloudflare.steamstatic.com/steam/apps/255710/header.jpg",
+          genre: "City-building · Simulation · Strategy",
+          category: "Simulation",
+          platform: "PC, PS4, Xbox, Switch",
+          releaseDate: "2015-03-10",
+          developer: "Colossal Order",
+          desc: "Simulator pembangunan kota modern yang mendalam. Rencana tata kota, kelola transportasi, ekonomi, dan layanan publik untuk menciptakan metropolis yang sempurna.",
+          trailer: "https://www.youtube.com/embed/7vlKoMi4Qr0",
+        },
+        {
+          id: "planetcoaster",
+          title: "Planet Coaster",
+          cover:
+            "https://cdn.cloudflare.steamstatic.com/steam/apps/493340/header.jpg",
+          genre: "Simulation · Management · Building",
+          category: "Simulation",
+          platform: "PC, PS4, PS5, Xbox",
+          releaseDate: "2016-11-17",
+          developer: "Frontier Developments",
+          desc: "Simulator taman hiburan terbaik. Bangun roller coaster epik, kelola operasional, dan ciptakan pengalaman tak terlupakan untuk pengunjung.",
+          trailer: "https://www.youtube.com/embed/91Kli1Uwk9g",
+        },
+        {
+          id: "fallguys",
+          title: "Fall Guys",
+          cover:
+            "https://cdn.cloudflare.steamstatic.com/steam/apps/1097150/header.jpg",
+          genre: "Battle Royale · Party · Multiplayer",
+          category: "Battle Royale",
+          platform: "PC, PS4, PS5, Xbox, Switch",
+          releaseDate: "2020-08-04",
+          developer: "Mediatonic",
+          desc: "Game battle royale kacau yang seru dimana 60 pemain berlomba melalui obstacle course yang gila hingga hanya satu yang menjadi pemenang!",
+          trailer: "https://www.youtube.com/embed/AyADwdiW7rQ",
+        },
+        {
+          id: "portal2",
+          title: "Portal 2",
+          cover:
+            "https://cdn.cloudflare.steamstatic.com/steam/apps/620/header.jpg",
+          genre: "Puzzle · Platformer · Sci-Fi",
+          category: "Puzzle",
+          platform: "PC, PS3, Xbox 360",
+          releaseDate: "2011-04-19",
+          developer: "Valve",
+          desc: "Game puzzle pertama dengan senjata portal yang memecahkan teka-teka ruangan dengan portal biru dan oranye.",
+          trailer: "https://www.youtube.com/embed/A88YiZdXugA",
+        },
+        {
+          id: "theswapper",
+          title: "The Swapper",
+          cover:
+            "https://cdn.cloudflare.steamstatic.com/steam/apps/231160/header.jpg",
+          genre: "Puzzle · Platformer · Sci-Fi · Philosophical",
+          category: "Puzzle",
+          platform: "PC, PS4, PS3, PS Vita, Wii U",
+          releaseDate: "2013-05-30",
+          developer: "Facepalm Games",
+          desc: "Masterpiece puzzle platformer dengan cloning mechanic yang genius. Gunakan Swapper gun untuk membuat clone dan swap consciousness antara mereka dalam puzzle yang semakin complex. Atmospheric sci-fi setting dengan visual claymation yang unique dan cerita filosofis tentang identity. Untuk penggemar puzzle yang mencari challenge intellectual dan experience yang memorable.",
+          trailer: "https://www.youtube.com/embed/mjWFXHYtAWI",
+        },
+        {
+          id: "thewitness",
+          title: "The Witness",
+          cover:
+            "https://cdn.cloudflare.steamstatic.com/steam/apps/210970/header.jpg",
+          genre: "Puzzle · Exploration · First-person",
+          category: "Puzzle",
+          platform: "PC, PS4, Xbox, Mobile",
+          releaseDate: "2016-01-26",
+          developer: "Thekla, Inc.",
+          desc: "Game puzzle first-person yang genius dari creator Braid. Terdampar di pulau misterius yang penuh dengan panel puzzle yang semakin complex. Tidak ada tutorial - pemain belajar mechanics melalui observasi dan experimentation. Setiap puzzle mengajarkan bahasa visual baru, dan environment sendiri menjadi bagian dari puzzle. Untuk yang suka challenge intellectual dan 'aha!' moments.",
+          trailer: "https://www.youtube.com/embed/ul7kNFD6noU",
+        },
+        {
+          id: "quantumconundrum",
+          title: "Quantum Conundrum",
+          cover:
+            "https://cdn.cloudflare.steamstatic.com/steam/apps/200010/header.jpg",
+          genre: "Puzzle · First-person · Physics · Comedy",
+          category: "Puzzle",
+          platform: "PC, PS3, Xbox ",
+          releaseDate: "2012-06-21",
+          developer: "Airtight Games",
+          desc: "First-person puzzle gem dari lead designer Portal! Shift antara dimensi dengan physics berbeda - dari fluffy dimension yang super ringan sampai slow-mo dimension dimana waktu melambat. Selesaikan creative puzzles dengan humor kocak dan bantuan kucing interdimensional yang menggemaskan. Perfect untuk fans Portal yang mencari puzzle mechanics baru yang equally brilliant dan entertaining!",
+          trailer: "https://www.youtube.com/embed/5pG0eeeuYdU",
+        },
+        {
+          id: "monumentvalley",
+          title: "Monument Valley",
+          cover:
+            "https://cdn1.epicgames.com/spt-assets/e56a7411805046d3b5b7253a6e4e0faa/monument-valley-bp09k.jpg",
+          genre: "Puzzle · Indie · Artistic · Atmospheric",
+          category: "Puzzle",
+          platform: "PC, Mobile",
+          releaseDate: "2014-04-03",
+          developer: "ustwo games",
+          desc: "Interactive artwork yang memukau! Journey melalui architecture impossible yang terinspirasi MC Escher, dimana perspective adalah kunci untuk memecahkan setiap puzzle. Dengan visual minimalist yang stunning, soundtrack yang meditative, dan cerita tanpa kata yang emotional, Monument Valley adalah experience yang harus dimainkan setiap penggemar puzzle. Buktikan bahwa mobile games bisa menjadi bentuk seni yang sophisticated dan meaningful.",
+          trailer: "https://www.youtube.com/embed/mh_4JJNULZ0",
+        },
+        {
+          id: "dungeonsofdreadrock",
+          title: "Dungeons of Dreadrock",
+          cover:
+            "https://assets.nintendo.com/image/upload/f_auto/q_auto/dpr_1.5/c_scale,w_400/ncom/software/switch/70010000052497/desc/5290f4c15d237d21e47d61e2ce5ab5898d72ec77fe6c2ea1a1b9496688dbd807",
+          genre: "Puzzle · Adventure · Dungeon Crawler · Retro",
+          category: "Puzzle",
+          platform: "PC, Mobile, Nintendo Switch",
+          releaseDate: "2022-01-20",
+          developer: "Christoph Minnameier",
+          desc: "Hidden gem puzzle adventure dengan 100 level yang brilliantly designed! Journey melalui dungeon berbahaya untuk menyelamatkan saudara, selesaikan puzzle yang semakin clever, dan hadapi creatures legendaris. Dengan retro pixel art yang charming, gameplay yang addictive, dan puzzle design yang akan test your wits, Dungeons of Dreadrock adalah must-play untuk fans puzzle games yang mencari challenge substantial dan satisfying progression.",
+          trailer: "https://www.youtube.com/embed/9HmFykKLdqQ",
+        },
+        {
+          id: "terraria",
+          title: "Terraria",
+          cover:
+            "https://cdn.cloudflare.steamstatic.com/steam/apps/105600/header.jpg",
+          genre: "Sandbox · Adventure · Action",
+          category: "Sandbox",
+          platform: "PC, PS4, Xbox, Switch, Mobile",
+          releaseDate: "2011-05-16",
+          developer: "Re-Logic",
+          desc: "Terraria adalah game petualangan 2D sandbox dengan eksplorasi, crafting, building, dan combat melawan berbagai monster dan bos.",
+          trailer: "https://www.youtube.com/embed/H77Zfzy4LWw",
+        },
+        {
+          id: "journey",
+          title: "Journey",
+          cover:
+            "https://cdn.cloudflare.steamstatic.com/steam/apps/638230/header.jpg",
+          genre: "Adventure · Indie · Atmospheric",
+          category: "Adventure",
+          platform: "PC, PS4, PS3",
+          releaseDate: "2012-03-13",
+          developer: "Thatgamecompany",
+          desc: "Experience poetic yang profound. Perjalanan spiritual melalui gurun menuju gunung suci. Multiplayer anonymous yang magical - temui traveler lain tanpa nama, komunikasi melalui melody. Visual stunning dan soundtrack yang award-winning.",
+          trailer: "https://www.youtube.com/embed/mU3nNT4rcFg",
+        },
+        {
+          id: "firewatch",
+          title: "Firewatch",
+          cover:
+            "https://cdn.cloudflare.steamstatic.com/steam/apps/383870/header.jpg",
+          genre: "Adventure · Mystery · Walking Simulator",
+          category: "Adventure",
+          platform: "PC, PS4, Xbox, Switch",
+          releaseDate: "2016-02-09",
+          developer: "Campo Santo",
+          desc: "First-person mystery di Wyoming wilderness. Sebagai Henry, kamu jadi fire lookout yang terisolasi. Develop relationship melalui walkie-talkie dengan supervisor Delilah sambil mengungkap conspiracy yang deepening. Art style yang beautiful dan voice acting superb.",
+          trailer: "https://www.youtube.com/embed/cXWlgP5hZzc",
+        },
+        {
+          id: "fallout4",
+          title: "Fallout 4",
+          cover:
+            "https://cdn.cloudflare.steamstatic.com/steam/apps/377160/header.jpg",
+          genre: "RPG · Open World · Post-apocalyptic",
+          category: "RPG",
+          platform: "PC, PS4, Xbox One",
+          releaseDate: "2015-11-10",
+          developer: "Bethesda Game Studios",
+          desc: "Fallout 4 adalah RPG pasca-apokaliptik di mana pemain menjelajahi Commonwealth Boston untuk menemukan anak mereka yang hilang.",
+          trailer: "https://www.youtube.com/embed/X5aJfebzkrM",
+        },
+      ];
+
+      const homeSection = document.getElementById("homeSection");
+      const detailSection = document.getElementById("detailSection");
+      const reviewsSection = document.getElementById("reviewsSection");
+      const gamesRow = document.getElementById("gamesRow");
+      const detailContent = document.getElementById("detailContent");
+      const reviewsGrid = document.getElementById("reviewsGrid");
+      const reviewsDetail = document.getElementById("reviewsDetail");
+      const categoriesContainer = document.getElementById(
+        "categoriesContainer"
+      );
+      const reviewsCategoriesContainer = document.getElementById(
+        "reviewsCategoriesContainer"
+      );
+      const searchInput = document.getElementById("searchInput");
+
+      let lastPage = "home";
+      let inReviewsDetail = false;
+      let currentCategory = "all";
+      let currentReviewsCategory = "all";
+      let searchQuery = "";
+      let currentSort = "default"; // default, az, newest, oldest
+      let currentReviewsSort = "default";
+
+      // Fungsi untuk format tampilan tanggal
+      function formatDisplayDate(dateStr) {
+        if (!dateStr) return "";
+
+        const months = [
+          "Jan",
+          "Feb",
+          "Mar",
+          "Apr",
+          "May",
+          "Jun",
+          "Jul",
+          "Aug",
+          "Sep",
+          "Oct",
+          "Nov",
+          "Dec",
+        ];
+
+        const date = new Date(dateStr);
+        const day = date.getDate();
+        const month = months[date.getMonth()];
+        const year = date.getFullYear();
+
+        return `${day} ${month} ${year}`;
+      }
+
+      // Ekstrak kategori unik dari data game
+      const categories = ["all"];
+      games.forEach((game) => {
+        if (game.category && !categories.includes(game.category)) {
+          categories.push(game.category);
+        }
+      });
+
+      // Render tombol kategori untuk halaman home
+      function renderCategories() {
+        categoriesContainer.innerHTML = "";
+        categories.forEach((cat) => {
+          const btn = document.createElement("button");
+          btn.className = `category-btn ${
+            cat === currentCategory ? "active" : ""
+          }`;
+          btn.textContent = cat === "all" ? "All Games" : cat;
+          btn.onclick = () => {
+            currentCategory = cat;
+            renderCategories();
+            applyFilters();
+          };
+          categoriesContainer.appendChild(btn);
+        });
+      }
+
+      // Render tombol kategori untuk halaman reviews
+      function renderReviewsCategories() {
+        reviewsCategoriesContainer.innerHTML = "";
+        categories.forEach((cat) => {
+          const btn = document.createElement("button");
+          btn.className = `category-btn ${
+            cat === currentReviewsCategory ? "active" : ""
+          }`;
+          btn.textContent = cat === "all" ? "All Games" : cat;
+          btn.onclick = () => {
+            currentReviewsCategory = cat;
+            renderReviewsCategories();
+            applyFilters();
+          };
+          reviewsCategoriesContainer.appendChild(btn);
+        });
+      }
+
+      // Fungsi untuk menerapkan semua filter (kategori + pencarian + sorting)
+      function applyFilters() {
+        if (homeSection.style.display !== "none") {
+          // Filter untuk halaman home
+          let filteredGames = [...games];
+
+          // Filter berdasarkan kategori
+          if (currentCategory !== "all") {
+            filteredGames = filteredGames.filter(
+              (g) => g.category === currentCategory
+            );
+          }
+
+          // Filter berdasarkan pencarian
+          if (searchQuery) {
+            filteredGames = filteredGames.filter(
+              (g) =>
+                g.title.toLowerCase().includes(searchQuery) ||
+                g.genre.toLowerCase().includes(searchQuery) ||
+                (g.category &&
+                  g.category.toLowerCase().includes(searchQuery)) ||
+                (g.developer && g.developer.toLowerCase().includes(searchQuery))
+            );
+          }
+
+          // Sorting
+          if (currentSort === "az") {
+            filteredGames.sort((a, b) => a.title.localeCompare(b.title));
+          } else if (currentSort === "newest") {
+            filteredGames.sort(
+              (a, b) => new Date(b.releaseDate) - new Date(a.releaseDate)
+            );
+          } else if (currentSort === "oldest") {
+            filteredGames.sort(
+              (a, b) => new Date(a.releaseDate) - new Date(b.releaseDate)
+            );
+          }
+
+          renderGamesList(filteredGames, "home");
+        } else if (
+          reviewsSection.style.display !== "none" &&
+          !inReviewsDetail
+        ) {
+          // Filter untuk halaman reviews
+          let filteredGames = [...games];
+
+          // Filter berdasarkan kategori
+          if (currentReviewsCategory !== "all") {
+            filteredGames = filteredGames.filter(
+              (g) => g.category === currentReviewsCategory
+            );
+          }
+
+          // Filter berdasarkan pencarian
+          if (searchQuery) {
+            filteredGames = filteredGames.filter(
+              (g) =>
+                g.title.toLowerCase().includes(searchQuery) ||
+                g.genre.toLowerCase().includes(searchQuery) ||
+                (g.category &&
+                  g.category.toLowerCase().includes(searchQuery)) ||
+                (g.developer && g.developer.toLowerCase().includes(searchQuery))
+            );
+          }
+
+          // Sorting
+          if (currentReviewsSort === "az") {
+            filteredGames.sort((a, b) => a.title.localeCompare(b.title));
+          } else if (currentReviewsSort === "newest") {
+            filteredGames.sort(
+              (a, b) => new Date(b.releaseDate) - new Date(a.releaseDate)
+            );
+          } else if (currentReviewsSort === "oldest") {
+            filteredGames.sort(
+              (a, b) => new Date(a.releaseDate) - new Date(b.releaseDate)
+            );
+          }
+
+          renderReviewsGrid(filteredGames);
+        }
+      }
+
+      // Event Listeners
+      document.getElementById("homeBtn").onclick = () => {
+        showPage("home");
+        applyFilters();
+      };
+
+      document.getElementById("reviewsBtn").onclick = () => {
+        showPage("reviews");
+        renderReviewsCategories();
+        applyFilters();
+      };
+
+      // Sorting event listeners untuk home
+      document.getElementById("sortAZ").onclick = () => {
+        currentSort = currentSort === "az" ? "default" : "az";
+        updateSortButtons();
+        applyFilters();
+      };
+
+      document.getElementById("sortNewest").onclick = () => {
+        currentSort = currentSort === "newest" ? "default" : "newest";
+        updateSortButtons();
+        applyFilters();
+      };
+
+      document.getElementById("sortOldest").onclick = () => {
+        currentSort = currentSort === "oldest" ? "default" : "oldest";
+        updateSortButtons();
+        applyFilters();
+      };
+
+      // Sorting event listeners untuk reviews
+      document.getElementById("sortReviewsAZ").onclick = () => {
+        currentReviewsSort = currentReviewsSort === "az" ? "default" : "az";
+        updateReviewsSortButtons();
+        applyFilters();
+      };
+
+      document.getElementById("sortReviewsNewest").onclick = () => {
+        currentReviewsSort =
+          currentReviewsSort === "newest" ? "default" : "newest";
+        updateReviewsSortButtons();
+        applyFilters();
+      };
+
+      document.getElementById("sortReviewsOldest").onclick = () => {
+        currentReviewsSort =
+          currentReviewsSort === "oldest" ? "default" : "oldest";
+        updateReviewsSortButtons();
+        applyFilters();
+      };
+
+      function updateSortButtons() {
+        document
+          .getElementById("sortAZ")
+          .classList.toggle("active", currentSort === "az");
+        document
+          .getElementById("sortNewest")
+          .classList.toggle("active", currentSort === "newest");
+        document
+          .getElementById("sortOldest")
+          .classList.toggle("active", currentSort === "oldest");
+      }
+
+      function updateReviewsSortButtons() {
+        document
+          .getElementById("sortReviewsAZ")
+          .classList.toggle("active", currentReviewsSort === "az");
+        document
+          .getElementById("sortReviewsNewest")
+          .classList.toggle("active", currentReviewsSort === "newest");
+        document
+          .getElementById("sortReviewsOldest")
+          .classList.toggle("active", currentReviewsSort === "oldest");
+      }
+
+      document.getElementById("backBtn").onclick = () =>
+        showPage(lastPage === "reviews" ? "reviews" : "home");
+
+      document.getElementById("backFromReviews").onclick = () => {
+        if (inReviewsDetail) {
+          reviewsDetail.innerHTML = "";
+          reviewsGrid.style.display = "grid";
+          inReviewsDetail = false;
+        } else {
+          showPage("home");
+        }
+      };
+
+      function showPage(page) {
+        homeSection.style.display = "none";
+        detailSection.style.display = "none";
+        reviewsSection.style.display = "none";
+
+        if (page === "home") {
+          homeSection.style.display = "block";
+          applyFilters();
+        } else if (page === "detail") {
+          detailSection.style.display = "block";
+        } else if (page === "reviews") {
+          reviewsSection.style.display = "block";
+          applyFilters();
+        }
+      }
+
+      function renderGamesList(list, from = "home") {
+        gamesRow.innerHTML = "";
+
+        if (list.length === 0) {
+          gamesRow.innerHTML = `
+            <div class="no-games">
+              <h3>Game Not Found</h3>
+              <p>Tidak ada game yang sesuai dengan pencarian atau filter yang dipilih.</p>
+              <p>Coba ubah kata kunci pencarian atau pilih kategori lain.</p>
+            </div>
+          `;
+          return;
+        }
+
+        list.forEach((g) => {
+          const div = document.createElement("div");
+          div.className = "card";
+          div.innerHTML = `
+            <img src="${g.cover}" alt="${g.title}">
+            <div class="title">${g.title}</div>
+            <div class="category-tag">${g.category}</div>
+            ${
+              g.releaseDate
+                ? `<div class="release-date">${formatDisplayDate(
+                    g.releaseDate
+                  )}</div>`
+                : ""
+            }
+          `;
+          div.onclick = () => openDetail(g.id, from);
+          gamesRow.appendChild(div);
+        });
+      }
+
+      function renderReviewsGrid(gamesList) {
+        reviewsGrid.innerHTML = "";
+        reviewsGrid.style.display = "grid";
+        inReviewsDetail = false;
+
+        if (gamesList.length === 0) {
+          reviewsGrid.innerHTML = `
+            <div class="no-games">
+              <h3>Game Not Found</h3>
+              <p>Tidak ada game yang sesuai dengan pencarian atau filter yang dipilih.</p>
+              <p>Coba ubah kata kunci pencarian atau pilih kategori lain.</p>
+            </div>
+          `;
+          return;
+        }
+
+        gamesList.forEach((g) => {
+          const card = document.createElement("div");
+          card.className = "small-card";
+          card.innerHTML = `
+            <img src="${g.cover}" alt="${g.title}">
+            <div class="title">${g.title}</div>
+            <div class="category-tag">${g.category}</div>
+            ${
+              g.releaseDate
+                ? `<div class="release-date">${formatDisplayDate(
+                    g.releaseDate
+                  )}</div>`
+                : ""
+            }
+          `;
+          card.onclick = () => showReviewsDetail(g.id);
+          reviewsGrid.appendChild(card);
+        });
+      }
+
+      function openDetail(id, from) {
+        const g = games.find((x) => x.id === id);
+        if (!g) return;
+        lastPage = from;
+        showPage("detail");
+        detailContent.innerHTML = `
+          <div class="detail-layout">
+            <div class="detail-left"><img src="${g.cover}" alt="${
+          g.title
+        }"></div>
+            <div class="detail-right">
+              <h2>${g.title}</h2>
+              <div class="meta"><strong>Developer:</strong> ${
+                g.developer || "Tidak tersedia"
+              }</div>
+              <div class="meta"><strong>Genre:</strong> ${g.genre}</div>
+              <div class="meta"><strong>Kategori:</strong> ${g.category}</div>
+              <div class="meta"><strong>Platform:</strong> ${g.platform}</div>
+              ${
+                g.releaseDate
+                  ? `<div class="meta"><strong>Tanggal Rilis:</strong> ${formatDisplayDate(
+                      g.releaseDate
+                    )}</div>`
+                  : ""
+              }
+              <div class="desc">${g.desc}</div>
+              <h3 style="color:#cfe3ff;margin-top:14px;">Trailer</h3>
+              <iframe class="trailer" src="${
+                g.trailer
+              }" allowfullscreen></iframe>
+              <div class="review-form">
+                <h3 style="margin-top:14px;color:#cfe3ff;">Beri Review</h3>
+                <input id="r_name" placeholder="Nama Anda">
+                <div id="r_stars" style="margin-top:8px"></div>
+                <textarea id="r_comment" rows="3" placeholder="Tulis komentar..."></textarea>
+                <button class="back-btn" id="r_submit">Kirim Review</button>
+                <div id="perGameReviews" style="margin-top:12px"></div>
+              </div>
+            </div>
+          </div>`;
+        renderStars();
+        renderReviews(g.id);
+        document.getElementById("r_submit").onclick = () => {
+          const name = document.getElementById("r_name").value.trim();
+          const rating = Number(
+            document.getElementById("r_stars").dataset.value || 0
+          );
+          const comment = document.getElementById("r_comment").value.trim();
+          if (!name || !rating || !comment)
+            return alert("Lengkapi semua kolom!");
+          saveReview(g.id, { name, rating, comment, time: Date.now() });
+          document.getElementById("r_name").value = "";
+          document.getElementById("r_comment").value = "";
+          renderStars();
+          renderReviews(g.id);
+        };
+      }
+
+      function renderStars() {
+        const wrap = document.getElementById("r_stars");
+        wrap.dataset.value = 0;
+        wrap.innerHTML = "";
+        for (let i = 1; i <= 5; i++) {
+          const sp = document.createElement("span");
+          sp.textContent = "☆";
+          sp.style.fontSize = "22px";
+          sp.style.cursor = "pointer";
+          sp.style.marginRight = "6px";
+          sp.onclick = () => {
+            wrap.dataset.value = i;
+            [...wrap.children].forEach(
+              (c, idx) => (c.textContent = idx < i ? "★" : "☆")
+            );
+          };
+          wrap.appendChild(sp);
+        }
+      }
+
+      // LOCALSTORAGE YANG SUDAH DIPERBAIKI
+      function loadAllReviews() {
+        try {
+          const stored = localStorage.getItem("rag_reviews");
+          if (!stored) return {};
+          return JSON.parse(stored);
+        } catch (error) {
+          console.error("Error loading reviews:", error);
+          return {};
+        }
+      }
+
+      function saveAllReviews(obj) {
+        try {
+          localStorage.setItem("rag_reviews", JSON.stringify(obj));
+        } catch (error) {
+          console.error("Error saving reviews:", error);
+        }
+      }
+
+      function saveReview(id, review) {
+        const all = loadAllReviews();
+        if (!all[id]) all[id] = [];
+        all[id].push(review);
+        saveAllReviews(all);
+      }
+
+      function renderReviews(id) {
+        const box = document.getElementById("perGameReviews");
+        const all = loadAllReviews();
+        const arr = (all[id] || []).slice().reverse();
+        box.innerHTML =
+          arr.length === 0
+            ? "<div style='color:#9fb6dd'>Belum ada review.</div>"
+            : arr
+                .map(
+                  (r) =>
+                    `<div class='item' style='background:var(--panel);margin:10px 0;padding:10px;border-radius:8px;'><strong>${
+                      r.name
+                    }</strong> — <small style='color:#9fb6dd'>${new Date(
+                      r.time
+                    ).toLocaleString()}</small><div style='color:#ffd966'>${"★".repeat(
+                      r.rating
+                    )}${"☆".repeat(5 - r.rating)}</div><div>${
+                      r.comment
+                    }</div></div>`
+                )
+                .join("");
+      }
+
+      function showReviewsDetail(id) {
+        const g = games.find((x) => x.id === id);
+        const all = loadAllReviews();
+        const arr = (all[id] || []).slice().reverse();
+        reviewsGrid.style.display = "none";
+        inReviewsDetail = true;
+        reviewsDetail.innerHTML = `
+          <div class="review-read">
+            <img src="${g.cover}" alt="${g.title}">
+            <h2>${g.title}</h2>
+            <div class="meta"><strong>Developer:</strong> ${
+              g.developer || "Tidak tersedia"
+            }</div>
+            <div class="meta"><strong>Genre:</strong> ${g.genre}</div>
+            <div class="meta"><strong>Kategori:</strong> ${g.category}</div>
+            <div class="meta"><strong>Platform:</strong> ${g.platform}</div>
+            ${
+              g.releaseDate
+                ? `<div class="meta"><strong>Tanggal Rilis:</strong> ${formatDisplayDate(
+                    g.releaseDate
+                  )}</div>`
+                : ""
+            }
+            <h3 style="color:#cfe3ff;margin-top:14px;">Review Pengunjung</h3>
+            ${
+              arr.length
+                ? arr
+                    .map(
+                      (r) =>
+                        `<div class='item' style='background:var(--panel);margin:10px auto;max-width:600px;padding:10px;border-radius:8px;'><strong>${
+                          r.name
+                        }</strong> — <small style='color:#9fb6dd'>${new Date(
+                          r.time
+                        ).toLocaleString()}</small><div style='color:#ffd966'>${"★".repeat(
+                          r.rating
+                        )}${"☆".repeat(5 - r.rating)}</div><div>${
+                          r.comment
+                        }</div></div>`
+                    )
+                    .join("")
+                : "<div style='color:#9fb6dd'>Belum ada review.</div>"
+            }
+          </div>`;
+      }
+
+      // Event listener untuk pencarian
+      searchInput.addEventListener("input", (e) => {
+        searchQuery = e.target.value.toLowerCase().trim();
+        applyFilters();
+      });
+
+      // Inisialisasi
+      renderCategories();
+      updateSortButtons();
+      updateReviewsSortButtons();
+      applyFilters();
+    </script>
+  </body>
+</html>
